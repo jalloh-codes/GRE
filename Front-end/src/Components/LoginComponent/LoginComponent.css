@@ -1,0 +1,18 @@
+.head_top_contains{
+    width: 100%;
+    height: auto;
+    margin: 7px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(66, 66, 199);
+}
+.Login_form_container{
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    min-height:600px; 
+    padding-top: 140px;
+}
