@@ -1,0 +1,22 @@
+.Login{
+    background-color: rgb(15, 15, 209);
+    border-radius: 0.7em;
+    min-width: 100px;
+    min-height: 30px;
+    margin: 4px;
+    margin-left: 100px; 
+    color: white;
+    text-align: center;
+}
+.SignUp{
+    background-color: rgb(15, 15, 209);
+    border-radius: 0.7em;
+    min-width: 100px;
+    min-height: 30px;
+    margin: auto;
+    color: white;
+    text-align: center;
+}
+.google_translate_element{
+    background-color: bisque;
+}

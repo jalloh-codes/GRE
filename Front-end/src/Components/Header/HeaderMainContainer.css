@@ -1,0 +1,21 @@
+.head-main-container{
+    width: 100%;
+    height: 35%;
+    margin: 10px;
+    background:url('./Header-picture.jpg') no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-menu{
+    width: auto;
+}
+
+.Bottom{
+    height: auto;
+    text-align: center;
+}
+.Bottom h1{
+    color:blue;
+}

@@ -1,0 +1,13 @@
+.About-main-container{
+    width: 100%;
+    height: 40%;
+    margin: 10px;
+    background:url('./welcome.jpeg') no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column; 
+}
+.About_body{
+    margin: 10px;
+    background-color: wheat;
+}
