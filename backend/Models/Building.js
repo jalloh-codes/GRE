@@ -9,7 +9,7 @@ const BuildingSchema =  new schema({
         type: String,
         required: [true, 'Empty field'],
         enum: {
-            values: ['apartments', 'hotel'],
+            values: ['Apartments', 'Hotel'],
             message:"{VALUE} 'building', 'room'"
         },
     },
@@ -34,7 +34,7 @@ const BuildingSchema =  new schema({
     },
     units:[{
         type: schema.Types.ObjectId,
-        ref: 'unit'
+        ref: 'unit',
     }],
     details:{
         parking:{
@@ -48,4 +48,4 @@ const BuildingSchema =  new schema({
     
 })
 
-module.exports = User = mongoose.model('Building', BuildingSchema);
+module.exports = Building = mongoose.model('Building', BuildingSchema);

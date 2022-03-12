@@ -11,6 +11,12 @@ const user = async (id) =>{
     return user
 }
 
+const AuthPayloadUser = async (email) =>{
+    const user = User.findOne({email: email}, {UserType: 1, password: 1})
+
+    return user 
+}
+
 const building =  async (bdID) =>{
     const buildings  = await Building.findOne({_id: bdID})
 
@@ -41,9 +47,8 @@ const unit =  async () =>{
     })
 }
 
-
 const resolver = {
-    createUser: async (args, req) =>{
+    SignUp: async (args, req) =>{
         const password = await bcrypt.hash(args.input.password, 12);
         const newUser =new  User({
             email: args.input.email,
@@ -56,12 +61,24 @@ const resolver = {
         let status = true
         await newUser.save()
         .then((res) =>{
-            console.log(res);
-            return {status}
+            return {status: true}
         }).catch(error =>{
             status = false
             throw Error(error, {status: status})
         })
+    },
+    
+    Login: async (args, req) =>{
+    
+        const email = args.email
+        const password = args.password
+        
+        const authuser =  await AuthPayloadUser(email)
+        console.log(authuser);
+        return{
+            token: 1,
+            user: 1
+        }
     },
     createHouse: async (args, req) =>{
        
@@ -147,8 +164,8 @@ const resolver = {
             throw Error(error)
         })
     },
-
-    getProperty: async (args, req) =>{
+    getProperty: async (parent, args, context) =>{
+        console.log(context);
         const houses = await House.find()
         const buildings  = await allBuildings()
         const units  = await unit()
@@ -158,6 +175,8 @@ const resolver = {
             building: buildings
         }
     }
+    
+
 
 }
 

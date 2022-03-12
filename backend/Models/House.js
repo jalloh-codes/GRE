@@ -4,7 +4,8 @@ const schema = mongoose.Schema;
 const HouseSchema =  new schema({
     lister:{
         type: schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
     loc:{
         region:{
@@ -76,4 +77,4 @@ const HouseSchema =  new schema({
     
 })
 
-module.exports = User = mongoose.model('House', HouseSchema);
+module.exports = House = mongoose.model('House', HouseSchema);

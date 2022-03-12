@@ -117,20 +117,24 @@ module.exports = buildSchema(`
         buildings: [Building]
         houses:  [House]
         units: [Unit]
-
     }
 
+
+    type AuthPayload {
+        token: Int!
+        user: Int!
+      }
     
     type RootQuery {
         getProperty: Property
     }
 
     type RootMutation {
-        createUser(input: createUser):Status
+        SignUp(input: createUser):Status
+        Login(email: String!, password: String!): AuthPayload
         createHouse(input: createHouse):Status
         createBuilding(input: createBuilding): Status
         createUnit(input: createUnit): Status
-        
     }
 
     schema{

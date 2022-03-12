@@ -4,7 +4,8 @@ const schema = mongoose.Schema;
 const UnitSchema =  new schema({
     building:{
         type: schema.Types.ObjectId,
-        ref: "building"
+        ref: "building",
+        required: true
     },
     details:{
         parking: {
@@ -44,4 +45,4 @@ const UnitSchema =  new schema({
     
 })
 
-module.exports = User = mongoose.model('Unit', UnitSchema);
+module.exports = Unit = mongoose.model('Unit', UnitSchema);
