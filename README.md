@@ -4,7 +4,7 @@ private project
 
 ## BACKEND
 
-    # User Model
+   # User Model
         - firstname required
         - lastname required
         - email required
