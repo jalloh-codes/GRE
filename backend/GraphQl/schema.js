@@ -1,6 +1,11 @@
 const {buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
+    type Role{
+        _id: ID!
+        name: String
+        created: String
+    }
     type User{
         _id: ID
         firstname: String
@@ -56,6 +61,7 @@ module.exports = buildSchema(`
     
     type House{
         _id: ID
+        lister: User
         images: [String]
         videos: [String]
         loc: Location
@@ -110,19 +116,20 @@ module.exports = buildSchema(`
         parking: Boolean
 
     }
+
     type Status{
-        status: Boolean!
+        status: String
+        msg: String
     }
     type Property{
-        buildings: [Building]
         houses:  [House]
         units: [Unit]
     }
 
 
     type AuthPayload {
-        token: Int!
-        user: Int!
+        token: String!
+        user: User
       }
     
     type RootQuery {
@@ -130,6 +137,7 @@ module.exports = buildSchema(`
     }
 
     type RootMutation {
+        createRole(name: String!): Status
         SignUp(input: createUser):Status
         Login(email: String!, password: String!): AuthPayload
         createHouse(input: createHouse):Status

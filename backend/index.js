@@ -6,7 +6,7 @@ const http =  require('http');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./GraphQl/schema')
 const resolver = require('./GraphQl/resolver')
-
+const auth = require('./middleware/auth')
 require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
@@ -14,6 +14,8 @@ const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
 
+
+app.use(auth);
 app.use('/gre', graphqlHTTP({
   schema: schema,
   rootValue: resolver,

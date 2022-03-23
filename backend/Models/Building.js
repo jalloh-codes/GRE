@@ -15,7 +15,7 @@ const BuildingSchema =  new schema({
     },
     lister:{
         type: schema.Types.ObjectId,
-        ref: "Lister",
+        ref: "User",
         required: true
     },
     loc:{
@@ -34,7 +34,7 @@ const BuildingSchema =  new schema({
     },
     units:[{
         type: schema.Types.ObjectId,
-        ref: 'unit',
+        ref: 'Unit',
     }],
     details:{
         parking:{

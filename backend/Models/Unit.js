@@ -4,7 +4,7 @@ const schema = mongoose.Schema;
 const UnitSchema =  new schema({
     building:{
         type: schema.Types.ObjectId,
-        ref: "building",
+        ref: "Building",
         required: true
     },
     details:{
