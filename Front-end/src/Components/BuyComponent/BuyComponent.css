@@ -1,0 +1,19 @@
+.here>.ui.input>input{
+  max-width: 50%;
+}
+.Buy_filter_container{
+  margin: 4px;
+  height: auto;
+  text-align: center;
+  display: flex;
+  /* background-color: gray; */
+  border: solid gray;
+  border-top: none;
+  box-shadow: 2.5px 5px #888888;
+}
+.Buy_filter_container_prices{
+  flex: 1;
+}
+.Buy_hometypes{
+  flex: 1;
+}

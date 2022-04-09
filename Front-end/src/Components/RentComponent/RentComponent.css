@@ -5,3 +5,84 @@
     text-align: center;
 
 }
+.Filter_container{
+    margin: 4px;
+    height: auto;
+    text-align: center;
+    display: flex;
+    /* background-color: gray; */
+    border: solid gray;
+    border-top: none;
+    box-shadow: 2.5px 5px #888888;
+}
+.price_input{
+    width: 100px;
+    margin: 4px;
+}
+.bed_and_baths_input{
+    width: 60px;
+    margin: 3px;
+}
+.rent_search_result{
+    text-align: center;
+    margin: auto;
+}
+.bar_number{
+    text-align: center;
+    align-items: center;
+}
+.bar_table{
+    margin-right: auto;
+    margin-left: auto;
+}
+.cell{
+    margin: 4px;
+    width: 20px;
+    border: solid gray;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.cell:hover{
+    background-color:grey;
+
+}
+.Filter_container_prices_dates{
+    flex: 3;
+    display: flex;
+}
+.filter_container_min_max{
+    flex: 3;
+}
+.chooseDate{
+    flex:1;
+    }
+.Filter_container_beds_baths{
+    flex: 2;
+    width: 40%;
+    text-align: center;
+    display: flex;
+}
+.beds_baths{
+    flex: 1;
+}
+.hometypes{
+    flex: 1;
+}
+.Money_sign{
+    max-width:15% ;
+}
+
+.Type_of_rent{
+flex: 1;
+text-align: left;
+}
+select.ui.dropdown{
+    height: 28px;
+}
+
+/* the amenities drop down button*/
+.dropdown-menu{
+min-width: 300px;
+min-height: 100px ;
+}

@@ -1,0 +1,17 @@
+.Contact_main_container{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    min-height:600px; 
+    padding-top: 40px;
+}
+.Contact-header-container{
+    width: 100%;
+    height: 450px;
+    margin: 10px;
+    background:url('./Support.webp') no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column; 
+}

@@ -11,20 +11,20 @@
     justify-content: space-around;
   }
   
-  .title {
+  .Main_title {
    font-size: 42px;
   }
   .picture{
     height: 90%;
   }
-  .price{
-    max-height: 10%;
-
+  .title{
+    font-size:medium;
+    cursor: pointer;
   }
   
   .image {
     height: 300px;
-    width: 300px;
+    width: auto;
     font-size: 20px;
     margin: 10px;
     display: inline-block;

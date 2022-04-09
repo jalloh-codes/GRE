@@ -1,0 +1,20 @@
+.Modal_body{
+    display: flex;
+}
+.calandar{
+    flex: 1;
+}
+.guesses{
+border: solid black;
+flex: 1;
+border-radius: 1em;
+text-align: center;
+}
+.guesses button{
+    border-radius: 0.8em;
+}
+.guesses label{
+    width: 130px;
+    margin: 4px;
+    text-align: center;
+}

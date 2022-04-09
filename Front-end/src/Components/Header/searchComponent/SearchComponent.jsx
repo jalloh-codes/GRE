@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import './SearchComponent.css'
 
 
 export const SearchComponent = ({ parentCallback }) => {

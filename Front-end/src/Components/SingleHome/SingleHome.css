@@ -1,0 +1,18 @@
+.property_title{
+    text-align: center;
+}
+.container_singleHOme_modal{
+    margin: 10 px;
+}
+.picture_for_singleHome_for_the_Modal{
+    
+    text-align: center;
+}
+
+.picture_for_singleHome_for_the_Modal img{
+    width: 60%;
+    height: 40%;
+}
+.ui.button{
+    background: #0ea4c5 none;
+}

@@ -21,8 +21,8 @@ export const Menu = () => {
             <Link to="/buy" class="item">
                 Buy
             </Link>
-            <Link to="/#" class="item">
-                Contact Us
+            <Link to="/contactUs" class="item">
+                Contact US
             </Link>
 
             <div class="right menu">
