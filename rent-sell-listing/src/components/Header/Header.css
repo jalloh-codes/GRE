@@ -1,0 +1,10 @@
+.head_top_contains{
+    width: 99%;
+    height: 100px;
+    margin: 4px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(66, 66, 199);
+}
