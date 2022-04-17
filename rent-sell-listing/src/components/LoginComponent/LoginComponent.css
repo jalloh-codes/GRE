@@ -1,0 +1,8 @@
+.Login_form_container{
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    min-height:600px; 
+    padding-top: 140px;
+}

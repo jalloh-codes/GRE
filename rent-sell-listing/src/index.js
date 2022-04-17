@@ -1,13 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from 'react-router-dom';
 import './index.css';
 import App from './App';
+import { LoginComponent } from './components/LoginComponent/LoginComponent';
+import { SignUpComponent } from './components/SignUpComponent/SignUpComponent';
+import { Rent_or_sell_Component } from './components/Rent_or_sell_Component/Rent_or_sell_Component';
+import { RentListingComponent } from './components/RentListingComponent/RentListingComponent';
+import { SellListingComponent } from './components/SellListingComponent/SellListingComponent';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/login" element={<LoginComponent />} />
+        <Route path="/sign-up" element={<SignUpComponent />} />
+        <Route path="/makeChoice" element={<Rent_or_sell_Component />} />
+        <Route path="/rentlisting" element={<RentListingComponent />} />
+        <Route path="/selllisting" element={<SellListingComponent />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
