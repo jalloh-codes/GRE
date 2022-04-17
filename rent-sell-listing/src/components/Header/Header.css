@@ -5,6 +5,16 @@
     background-repeat: no-repeat;
     background-size: auto;
     display: flex;
-    flex-direction: column;
     background-color: rgb(66, 66, 199);
+}
+.left_of_menu{
+    flex: 3;
+}
+.menu{
+    flex: 1;
+    margin: 15px;
+   text-align: right;
+}
+.button{
+    margin: 10px;
 }

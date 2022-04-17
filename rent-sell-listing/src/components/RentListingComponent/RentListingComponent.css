@@ -1,0 +1,27 @@
+.rent_listing_container{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    min-height:600px; 
+}
+
+.property{
+    /* background-color: aqua; */
+    display: flex;
+}
+.property_info{
+    flex: 1;
+    /* background-color: blueviolet; */
+}
+.property_pictures{
+    flex: 1;
+    /* background-color: brown; */
+    text-align: center;
+}
+.rest_of_the_info{
+    /* background-color:chartreuse; */
+}
+.prop_input{
+    margin: 4px;
+}
