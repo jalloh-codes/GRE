@@ -1,18 +1,20 @@
 const User = require('../Models/User');
 const jwt  = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const House = require('../Models/House')
-const Building =  require('../Models/Building')
-const Unit = require('../Models/Unit')
+const Property = require('../Models/Property')
+
 
 const Roles = require('../Models/Roles');
 const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
 const { populate } = require('../Models/Roles');
 
+
+// verify authantication and authorization
 const VerifyAuthorization =(req, authorization) =>{
-    if(!req.isAuth) throw new Error('Unauthanticated')
-    if(!req.auth.authorization.includes(authorization)) throw new Error('Unauthorization to perfome this task')
+   
+    if(!req.isAuth) throw new Error('Authentication Failed')
+    if(!req.auth.authorization.includes(authorization)) throw new Error('Not Authorised')
 }
 
 const user = async (id) =>{
@@ -57,6 +59,7 @@ const unit =  async () =>{
 }
 
 const resolver = {
+
     createRole: async (args, req) =>{
         const newRoles = new Roles({
             name:  args.name
@@ -72,6 +75,7 @@ const resolver = {
             throw Error(error)
         })
     },
+
     SignUp: async (args, req) =>{
 
         const userType = args.input.UserType
@@ -144,20 +148,21 @@ const resolver = {
             }
         }
     },
-    createHouse: async (args, req) =>{
+
+    createProperty: async (args, req) =>{
         try{
-            //console.log(req.auth.authorization);
-            VerifyAuthorization(req, 'createHouse')
-            // if(!req.isAuth) throw new Error('Unauthanticated')
-            // if(!req.auth.authorization.includes('createHouse')) throw new Error('Unauthorization to perfome this task')
+            
+            VerifyAuthorization(req, 'createProperty')
+            
             let auth = req.auth
 
-            const NewHouse =  new House({
+            const Newstudio =  new Property({
                 lister: auth._id,
                 images: args.input.images,
                 videos: args.input.videos,
                 propertyType:  args.input.propertyType,
                 details:{
+                    studio: args.input.studio,
                     length: args.input.length,
                     width: args.input.width,
                     bed: args.input.bed,
@@ -172,119 +177,142 @@ const resolver = {
                     lng: args.input.lng
                 },
                 descriptions: args.input.descriptions,
+                quantity: args.input.quantity
             })
-            await NewHouse.save()
+            await Newstudio.save()
+   
             return{
                 status: true
             }
-            // .then(_ =>{
-            //     return{
-            //         status: true
-            //     }
-            // }).catch(error =>{
-            //     throw Error(error)
-            // })
 
         }catch(error){
             throw Error(error)
-        }
-    },
-    createBuilding: async (args, req) =>{
+        }    },
 
-        try {
-            VerifyAuthorization(req, 'createBuilding')
-            console.log( args.input.propertyType);
-            let auth = req.auth
-            const newBuilding = new Building({
-                name: args.input.name,
-                lister: auth._id,
-                details:{
-                   parking: args.input.parking,
-                   built: args.input.built
-                },
-                loc:{
-                    region: args.input.region,
-                    lat: args.input.lat,
-                    lng: args.input.lng
-                },
-                propertyType: args.input.propertyType,
-            })
-    
-            await newBuilding.save()
-            return{
-                status: true
-            }
-        } catch (error) {
-            throw Error(error)
-        }
-
-    },
-    createUnit: async (args, req) =>{
-        try {
-            VerifyAuthorization(req, 'createUnit')
-            const newUnit = new Unit({
-                building: args.input.building,
-                details:{
-                    length: args.input.length,
-                    width: args.input.width,
-                    bed: args.input.bed,
-                    bath: args.input.bath,
-                    price: args.input.price,
-                    parking: args.input.parking
-                },
-                descriptions: args.input.descriptions
-            })
-            await newUnit.save()
-            await Building.findOneAndUpdate({_id: args.input.building},
-                {$push:{units: newUnit._id}})
-            return{
-                status: true
-            }
-        } catch (error) {
-            throw Error(error)
-        }
-    },
-    getProperty: async (_, req) =>{
-        let auth = req.auth
-
-            var  houses
-            var units
-            if (req.isAuth){
-                 houses = House.find()
-                .populate({path:'lister',  select:['email', '_id', 'firstname', 'lastname']})
+    // Non Air BnB type 
+    getProperty: async (args, req) =>{
         
-                 units = Unit
-                .find()
-                .populate({path: 'building', populate:{
-                    path: 'lister', select:['email', '_id', 'firstname', 'lastname']
-                }})
-            }else{
-                 houses = House.find()
-                 
-                 units = Unit.find().populate({path: 'building'})
+        const searchInput = args.input
+        var search
+        var properties
+        let match = {
+            active: true
+        }
+        
+        if(searchInput != undefined){
+            const location = searchInput.location
+            const priceMin = searchInput.priceMin
+            const priceMax = searchInput.priceMax
+            const bedMin =  searchInput.bedMin
+            const bedMax = searchInput.bedMax
+            const bathMin = searchInput.bathMin
+            const bathMax = searchInput.bathMax 
+            const parking =  searchInput.parking 
+    
+
+            if(priceMin != undefined || priceMax != undefined){
+                let price =  {'details.price': {}}
+                if(priceMin != undefined){
+                    Object.assign(price['details.price'], {"$gte" : priceMin})
+                }
+                if(priceMax != undefined){
+                    Object.assign(price['details.price'], {"$lte" : priceMax})
+                }
+                Object.assign(match, price)
+            }
+            if(bedMin != undefined || bedMax != undefined){
+                let bed =  { 'details.bed': {}}
+                if(bedMin != undefined){
+                    Object.assign(bed['details.bed'], {"$gte" : bedMin})
+                }
+                if(bedMax != undefined){
+                    Object.assign(bed['details.bed'], {"$lte" : bedMax})
+                }
+                Object.assign(match, bed)
+            }
+
+            if(bathMin != undefined || bathMax != undefined){
+                let bath =  {'details.bath': {}}
+                if(bathMin != undefined){
+                    Object.assign(bath['details.bath'], {"$gte" : bathMin})
+                }
+                if(bathMax != undefined){
+                    Object.assign(bath['details.bath'], {"$lte" : bathMax})
+                }
+                Object.assign(match, bath)
+            }
+
+            if(parking != undefined){
+                let data = {'details.parking': parking}
+                Object.assign(match, data);
+            }
+        
+        
+            if(location != undefined){
+                search = { $search: {index: 'property',
+                    text: { query: location,
+                        path: {'wildcard': '*'}}
+                }}
                 
             }
-    
-        // const units = 
-        // .populate({path:'lister',  select:['email', '_id', 'firstname', 'lastname']})
-        // .populate({path:'units'})
-    
-       
-        // const houses =  House.find()
-        // .populate({path:'lister',  select:['email', '_id', 'firstname', 'lastname']})
-        
-
-
-        // const buildings  = await allBuildings()
-
-        return {
-            houses: houses,
-            units: units,
         }
-    }
+        const auth = req.auth
+            
+        if (req.isAuth && auth.authorization.includes('getProperty')){
+            const compute = search ? [search,{"$match": match},
+            {
+                "$lookup" : { 
+                    "from" : "users", 
+                    "localField" : "lister", 
+                    "foreignField" : "_id",
+                    pipeline: [
+                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+                    ], 
+                    "as" : "lister"
+                }
+            },
+            {"$unwind": "$lister"}] :[{"$match": match},
+            {
+                "$lookup" : { 
+                    "from" : "users", 
+                    "localField" : "lister", 
+                    "foreignField" : "_id",
+                    pipeline: [
+                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+                    ], 
+                    "as" : "lister"
+                }
+            },
+            {"$unwind": "$lister"}]
+            properties =await  Property.aggregate(compute,{ 
+                "allowDiskUse" : false
+            })
+        }else{
+            
+            const compute = search ? [search,{"$match": match}] :[{"$match": match}] 
+            
+            properties =await Property.aggregate(compute,{ 
+                "allowDiskUse" : false
+            })
+            
+        }
+        return {
+            properties: properties,
+        }
+    },
     
+    // Air BnB
+    getAirBnB: async (args, req) =>{
+
+    },
+
+    checkoutHome: async (args, req) =>{
+        //place: ID, from: String
+        const from = ''
+    }
 
 
 }
 
 module.exports = resolver
+

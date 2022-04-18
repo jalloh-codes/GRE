@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
-const HouseSchema =  new schema({
+const PropertySchema =  new schema({
     lister:{
         type: schema.Types.ObjectId,
         ref: "User",
@@ -9,6 +9,10 @@ const HouseSchema =  new schema({
     },
     loc:{
         region:{
+            type: String,
+            required: true
+        },
+        commune:{
             type: String,
             required: true
         },
@@ -28,14 +32,18 @@ const HouseSchema =  new schema({
         type: String,
         required: [true, 'Empty field'],
         enum: {
-            values: ['House', 'Room'],
-            message:"{VALUE} 'House', 'Room'"
+            values: ['House', 'Room', 'Apartment'],
+            message:"{VALUE} 'House', 'Room', 'Apartment'"
         },
     },
     videos:[
         {type:String}
     ],
     details:{
+        studio:{
+            type: Boolean,
+            default: false
+        },
         length:{
             type: Number,
             required: true
@@ -58,6 +66,18 @@ const HouseSchema =  new schema({
             type: Boolean,
             default: false
         },
+        airCondition:{
+            type: Boolean,
+            default: false
+        },
+        wifi:{
+            type: Boolean,
+            default: false
+        },
+        furnished:{
+            type: Boolean,
+            default: false
+        },
         built:{
             type: String
         },
@@ -72,9 +92,11 @@ const HouseSchema =  new schema({
     active:{
         type: Boolean,
         default: true
+    },
+    quantity:{
+        type: Number,
+        required: true
     }
-    
-    
 })
 
-module.exports = House = mongoose.model('House', HouseSchema);
+module.exports = House = mongoose.model('Property', PropertySchema);

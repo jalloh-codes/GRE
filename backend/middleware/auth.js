@@ -18,9 +18,8 @@ module.exports = (req, res, next) =>{
         return next();
     }
 
-
+   
     try {
-       
        let decodeToken =  jwt.verify(token, process.env.SECRECT);
 
        if(!decodeToken){

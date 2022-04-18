@@ -1,4 +1,4 @@
-const Listing = ['createHouse', 'createBuilding', 'createUnit', 'getProperty']
+const Listing = ['createProperty', 'getProperty']
 const BuyOrRent = ['getProperty']
 
 const avalianleRoles =  new Set(Listing.concat(BuyOrRent))
