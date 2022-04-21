@@ -1,6 +1,11 @@
 const {buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
+    type Role{
+        _id: ID!
+        name: String
+        created: String
+    }
     type User{
         _id: ID
         firstname: String
@@ -14,37 +19,15 @@ module.exports = buildSchema(`
         lat: Float
         lng: Float
     }
-    type UnitDetails{
-        length: Int
-        width: Int
-        bed: Int
-        bath: Int
-        price: Int
-        parking: Boolean
-    }
-    type Unit{
+    type Lister{
         _id: ID
-        building: Building
-        details: UnitDetails
-        descriptions: String
-        active: Boolean
+        firstname: String
+        lastname: String
+        email: String
     }
 
-    type BuildingGetails{
-        parking: Boolean
-        built: String
-    }
-    type Building{
-        _id: ID
-        name: String
-        propertyType: String
-        lister: User
-        units: [Unit]
-        loc: Location
-        details: BuildingGetails
-    }
-
-    type HouseDetails{
+    type PropertyDetails{
+        studio: Boolean
         length: Int
         width: Int
         bed: Int!
@@ -52,18 +35,47 @@ module.exports = buildSchema(`
         parking: Boolean
         built: String
         price: Int!
+        airCondition: Boolean
+        wifi: Boolean
+        furnished: Boolean
     }
     
-    type House{
+    type Property{
         _id: ID
+        lister: Lister
         images: [String]
         videos: [String]
         loc: Location
         propertyType: String
-        details: HouseDetails
+        details: PropertyDetails
+        descriptions: String
+        active: Boolean
+        quantity: Int
+    }
+
+    type AirBnB{
+        _id: ID
+        lister: Lister
+        start_date: String
+        end_date: String
+        reservation: [Reservation]
+        videos: [String]
+        loc: Location
+        propertyType: String
+        details: PropertyDetails
         descriptions: String
         active: Boolean
     }
+
+    type Reservation{
+        lister: Lister
+        airBnB: AirBnB
+        start_date: String
+        end_date: String
+        price: Float
+        update_at: String
+    }
+
     input createUser{
         firstname: String!
         lastname: String!
@@ -72,9 +84,12 @@ module.exports = buildSchema(`
         UserType: String!
         phoneNumber: String!
     }
-    input createHouse{
+
+    input createProperty{
         images: [String]!
         videos: [String]
+        studio: Boolean
+        quantity: Int!
         length: Int
         width: Int
         bed: Int!
@@ -89,52 +104,41 @@ module.exports = buildSchema(`
         lng: Float!
     }
 
-    input createBuilding{
-        name: String
-        propertyType: String!
-        region: String!
-        lat: Float!
-        lng: Float!
+    input search{
+        location: String
+        priceMin: Float
+        priceMax: Float
+        bedMin: Int
+        bedMax: Int
+        bathMin: Int
+        bathMax: Int
         parking: Boolean
-        built: String
     }
 
-    input createUnit{
-        building: ID!
-        length: Int!
-        width: Int!
-        bed: Int!
-        bath: Int!
-        price: Int!
-        descriptions: String
-        parking: Boolean
-
-    }
     type Status{
-        status: Boolean!
-    }
-    type Property{
-        buildings: [Building]
-        houses:  [House]
-        units: [Unit]
+        status: String
+        msg: String
     }
 
+    type listing{
+        properties:  [Property]
+    }
 
     type AuthPayload {
-        token: Int!
-        user: Int!
-      }
+        token: String!
+        user: User
+    }
     
     type RootQuery {
-        getProperty: Property
+        getProperty(input: search): listing
     }
 
     type RootMutation {
+        createRole(name: String!): Status
         SignUp(input: createUser):Status
         Login(email: String!, password: String!): AuthPayload
-        createHouse(input: createHouse):Status
-        createBuilding(input: createBuilding): Status
-        createUnit(input: createUnit): Status
+        createProperty(input: createProperty):Status
+        checkoutHome(place: ID, from: String): Status
     }
 
     schema{
