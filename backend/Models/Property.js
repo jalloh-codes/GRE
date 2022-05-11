@@ -79,7 +79,7 @@ const PropertySchema =  new schema({
             default: false
         },
         built:{
-            type: String
+            type: Number
         },
         price:{
             type: Number,

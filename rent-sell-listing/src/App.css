@@ -28,6 +28,22 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+.spinner-border{
+  margin: 10px;
+  width: 5rem;
+  height: 5rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fade.alert.alert-danger.alert-dismissible{
+  width: 500px;
+  margin: auto;
+}
 
 .App-link {
   color: #61dafb;

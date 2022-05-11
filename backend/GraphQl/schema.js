@@ -16,6 +16,7 @@ module.exports = buildSchema(`
     }
     type Location{
         region: String
+        commune: String
         lat: Float
         lng: Float
     }
@@ -81,8 +82,8 @@ module.exports = buildSchema(`
         lastname: String!
         email: String!
         password: String!
-        UserType: String!
         phoneNumber: String!
+        UserType: String!
     }
 
     input createProperty{
@@ -95,13 +96,17 @@ module.exports = buildSchema(`
         bed: Int!
         bath: Int!
         propertyType: String!
-        parking: Boolean
-        built: String
-        price: Int!
+        built: Int
+        price: Float!
         descriptions: String
         region: String!
+        commune: String!
         lat: Float!
         lng: Float!
+        parking: Boolean
+        airCondition: Boolean
+        furnished: Boolean
+        wifi: Boolean
     }
 
     input search{
@@ -116,8 +121,8 @@ module.exports = buildSchema(`
     }
 
     type Status{
-        status: String
-        msg: String
+        status: Boolean
+        message: String
     }
 
     type listing{
@@ -126,7 +131,7 @@ module.exports = buildSchema(`
 
     type AuthPayload {
         token: String!
-        user: User
+        user: Lister
     }
     
     type RootQuery {
@@ -135,8 +140,8 @@ module.exports = buildSchema(`
 
     type RootMutation {
         createRole(name: String!): Status
-        SignUp(input: createUser):Status
-        Login(email: String!, password: String!): AuthPayload
+        signup(input: createUser): Status
+        login(email: String!, password: String!): AuthPayload
         createProperty(input: createProperty):Status
         checkoutHome(place: ID, from: String): Status
     }

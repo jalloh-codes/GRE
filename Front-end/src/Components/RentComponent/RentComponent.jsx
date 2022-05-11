@@ -21,7 +21,7 @@ import pict7 from "../../pictures/pict8.webp";
 import pict8 from "../../pictures/pict9.jpeg";
 import pict9 from "../../pictures/pict10.webp";
 
-const baseURL = "https://api.apify.com/v2/datasets/hiB6fZsc3sBze21Vb/items?clean=true&format=json";
+const baseURL = "https://api.apify.com/v2/datasets/2H2K256mgdK4aB39j/items?clean=true&format=json";
 const pictureTab = [pict0, pict1, pict2, pict3, pict4, pict5, pict6, pict7, pict8, pict9, pict0, pict1, pict2, pict3, pict4, pict5, pict6, pict7, pict8, pict9];
 
 export const RentComponent = () => {

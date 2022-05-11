@@ -7,10 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
-export const Rent_or_sell_Component = () => {
+export const Rent_or_sell_Component = ({authStatus, logout}) => {
+
     return (
         <div className="App">
-            <Header />
+                <Header authStatus={authStatus} logout={logout}/>
 
             <div className="Login_form_container">
                 <Form>
