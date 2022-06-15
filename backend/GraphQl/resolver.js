@@ -2,6 +2,8 @@ const User = require('../Models/User');
 const jwt  = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Property = require('../Models/Property')
+
+
 const Roles = require('../Models/Roles');
 const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
@@ -24,6 +26,7 @@ const AuthPayloadUser = async (email) =>{
 
     return user 
 }
+
 
 const building =  async (bdID) =>{
     const buildings  = await Building.findOne({_id: bdID})
@@ -65,8 +68,7 @@ const resolver = {
         await newRoles.save()
         .then(res =>{
             return{
-                status: true,
-                message: ''
+                status: true
             }
         })
         .catch(error =>{
@@ -74,11 +76,9 @@ const resolver = {
         })
     },
 
-    signup: async (args, req) =>{
-        const userType = args.input.UserType
-        const checkUser =  await User.findOne({email: args.input.email},{_id:0,email: 1}).exec();
-        if (checkUser) throw new Error("User already exists, please sign in")
+    SignUp: async (args, req) =>{
 
+        const userType = args.input.UserType
         let roles = []
         if (userType === 'Listing'){
             roles = await Roles.find({name: {$in: Listing}},{_id: 1})
@@ -87,7 +87,6 @@ const resolver = {
         }
         if(roles.length === 0) throw new Error('No Roles provided')
         const password = await bcrypt.hash(args.input.password, 12);
-
         const newUser =new  User({
             email: args.input.email,
             firstname: args.input.firstname,
@@ -97,22 +96,17 @@ const resolver = {
             roles: roles,
             phoneNumber: args.input.phoneNumber
         })
-
-       
         let status = true
         await newUser.save()
         .then((res) =>{
-            return {
-                status: true,
-                message: "Account created"
-            }
+            return {status: true}
         }).catch(error =>{
             status = false
-            throw Error("Error creating user", {status: status})
+            throw Error(error, {status: status})
         })
     },
     
-    login: async (args, req) =>{
+    Login: async (args, req) =>{
         const email = args.email
         const password = args.password
         
@@ -160,8 +154,8 @@ const resolver = {
             
             VerifyAuthorization(req, 'createProperty')
             
-            const auth = req.auth
-            console.log(args.input);
+            let auth = req.auth
+
             const Newstudio =  new Property({
                 lister: auth._id,
                 images: args.input.images,
@@ -179,7 +173,6 @@ const resolver = {
                 },
                 loc:{
                     region: args.input.region,
-                    commune: args.input.commune,
                     lat: args.input.lat,
                     lng: args.input.lng
                 },
@@ -189,14 +182,12 @@ const resolver = {
             await Newstudio.save()
    
             return{
-                status: true,
-                message: 'Property added'
+                status: true
             }
 
         }catch(error){
             throw Error(error)
-        }    
-    },
+        }    },
 
     // Non Air BnB type 
     getProperty: async (args, req) =>{
@@ -324,3 +315,4 @@ const resolver = {
 }
 
 module.exports = resolver
+

@@ -13,7 +13,7 @@ import { SignUpComponent } from './components/SignUpComponent/SignUpComponent';
 import { Rent_or_sell_Component } from './components/Rent_or_sell_Component/Rent_or_sell_Component';
 import { RentListingComponent } from './components/RentListingComponent/RentListingComponent';
 import { SellListingComponent } from './components/SellListingComponent/SellListingComponent';
-import {useToken} from './components/Api/useToken'
+import {useToken} from './components/Api/useToken';
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
