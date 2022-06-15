@@ -115,7 +115,6 @@ export const SingleHome = (props) => {
             <a className="title" onClick={() => setModalShow(true)}>
                 {homeTitle(props.value)}
             </a>
-
             <MyVerticallyCenteredModal
                 show={modalShow}
                 onHide={() => setModalShow(false)}
