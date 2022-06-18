@@ -109,6 +109,28 @@ module.exports = buildSchema(`
         wifi: Boolean
     }
 
+    input airbnbInput{
+        studio: Boolean
+        length: Int
+        width: Int
+        bed: Int!
+        bath: Int!
+        images: [String]!
+        name: String
+        propertyType: String
+        built: Int
+        price: Float!
+        descriptions: String
+        region: String!
+        commune: String!
+        lat: Float!
+        lng: Float!
+        parking: Boolean
+        airCondition: Boolean
+        furnished: Boolean
+        wifi: Boolean
+    }
+
     input search{
         location: String
         priceMin: Float
@@ -141,8 +163,9 @@ module.exports = buildSchema(`
     type RootMutation {
         createRole(name: String!): Status
         signup(input: createUser): Status
-        login(email: String!, password: String!): AuthPayload
+        Login(email: String!, password: String!): AuthPayload
         createProperty(input: createProperty):Status
+        createAirBnb(input: airbnbInput):Status
         checkoutHome(place: ID, from: String): Status
     }
 

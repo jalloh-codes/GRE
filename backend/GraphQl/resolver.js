@@ -8,6 +8,7 @@ const Roles = require('../Models/Roles');
 const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
 const { populate } = require('../Models/Roles');
+const AirBnB = require('../Models/AirBnB');
 
 
 // verify authantication and authorization
@@ -120,7 +121,6 @@ const resolver = {
         let authorization =await  authuser.roles.map(e =>  e['name']);
 
         // delete authuser.password
-        
         const payload = {
             _id: authuser._id,
             email: authuser.email,
@@ -172,6 +172,7 @@ const resolver = {
                 },
                 loc:{
                     region: args.input.region,
+                    commune: args.input.commune,
                     lat: args.input.lat,
                     lng: args.input.lng
                 },
@@ -300,9 +301,50 @@ const resolver = {
         }
     },
     
+    // Create Airbnb Property
+    createAirBnb: async (args, req) =>{
+        try{
+            
+            VerifyAuthorization(req, 'createAirBnb')
+            const inputs = args.input
+            const auth = req.auth
+            const NewAirbnb=  new AirBnB({
+                lister: auth._id,
+                name: inputs.name,
+                images: args.input.images,
+                propertyType:  args.input.propertyType,
+                details:{
+                    studio: inputs.studio,
+                    length: inputs.length,
+                    width: inputs.width,
+                    bed: inputs.bed,
+                    bath: inputs.bath,
+                    parking: inputs.parking,
+                    built: inputs.built,
+                    price: inputs.price,
+                },
+                loc:{
+                    region: inputs.region,
+                    commune: inputs.commune,
+                    lat: inputs.lat,
+                    lng: inputs.lng
+                },
+                descriptions: inputs.descriptions, 
+            })
+            await NewAirbnb.save()
+   
+            return{
+                status: true,
+                "message": "New AirBnb property added!"
+            }
+        }catch(error){
+            throw Error(error)
+        }    
+    },
+
     // Air BnB
     getAirBnB: async (args, req) =>{
-
+        
     },
 
     checkoutHome: async (args, req) =>{
