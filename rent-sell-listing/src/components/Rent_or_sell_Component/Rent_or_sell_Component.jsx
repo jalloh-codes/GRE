@@ -11,8 +11,7 @@ export const Rent_or_sell_Component = ({authStatus, logout}) => {
 
     return (
         <div className="App">
-                <Header authStatus={authStatus} logout={logout}/>
-
+            <Header authStatus={authStatus} logout={logout}/>
             <div className="Login_form_container">
                 <Form>
 

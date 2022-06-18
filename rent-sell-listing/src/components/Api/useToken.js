@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useNavigate} from 'react-router-dom';
+// import { useNavigate} from 'react-router-dom';
 
 export const  useToken  =  () =>{
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const getToken =   () => {
     const tokenString = localStorage.getItem('token');
     const userToken = JSON.parse(tokenString);
@@ -17,18 +17,23 @@ export const  useToken  =  () =>{
     setToken(userToken);
   };
   
+  const deleteToken = async () =>{
+    await localStorage.removeItem('token')
+    await localStorage.removeItem('user')
+  }
 
-  const logout = () => {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      return navigate('/')
+  const logout = async () => {
+    deleteToken().then((res) =>{
+      return res
+    }).catch(error =>{
+      return error
+    })
  }
 
   return {
     setToken: saveToken,
     token,
-
-    logout: logout,
+    removeToken: logout,
 
   }
 }

@@ -35,7 +35,7 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
 
   const link = from([
     errorLink,
-     new HttpLink({uri: "http://192.168.1.32:8080/gre"}), 
+     new HttpLink({uri: "http://localhost:8080/gre"}), 
   ])
 
   const authMiddleware = new ApolloLink((operation, forward) => {
