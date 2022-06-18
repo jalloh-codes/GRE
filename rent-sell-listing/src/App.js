@@ -13,8 +13,8 @@ import { SignUpComponent } from './components/SignUpComponent/SignUpComponent';
 import { Rent_or_sell_Component } from './components/Rent_or_sell_Component/Rent_or_sell_Component';
 import { RentListingComponent } from './components/RentListingComponent/RentListingComponent';
 import { SellListingComponent } from './components/SellListingComponent/SellListingComponent';
-import {useToken} from './components/Api/useToken';
-
+import {useToken} from './components/Api/useToken'
+import Loading from  './components/ApiHandling/Loading'
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
     graphQLErrors.map(({ message, locations, path }) =>
@@ -31,7 +31,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const link = from([
   errorLink,
-   new HttpLink({uri: "http://192.168.1.32:8080/gre"}), 
+   new HttpLink({uri: "http://localhost:8080/gre"}), 
 ])
 
 // const authMiddleware = ApolloLink((operation, forward) => {
@@ -68,25 +68,35 @@ const client = new ApolloClient({
 function App() {
   
   const navigate = useNavigate()
-  const { token, setToken, logout} = useToken();
+  const { token, setToken, removeToken} = useToken();
   const [authStatus, setAuthStatus] =  useState(false)
+  const [logoutStatus, setLogoutState] = useState(false)
 
-
+  const logout = async () => {
+    setLogoutState(true)
+      await removeToken().then((res) =>{
+        setTimeout(()=>{
+          console.log(localStorage.getItem('token'));
+          setAuthStatus(false)
+          setLogoutState(false)
+        }, 3000)
+      })
+  }
+  
   useEffect(() =>{
-    if(token){
+    if(localStorage.getItem('token')){
       setAuthStatus(true)
       return navigate('/makeChoice')
     }else{
-      return navigate('/')
+      return navigate("/home")
     }
-    
-    
-    
-  },[])
+  },[logoutStatus])
 
   return(
     <ApolloProvider  client={client}>
       <div className="App">
+        {logoutStatus?
+          <Loading />:
         <Routes>
           {token && authStatus ?
           <>
@@ -95,11 +105,12 @@ function App() {
           <Route path="/selllisting" element={<SellListingComponent authStatus={authStatus} logout={logout}/>} />
           </>:
           <>
-          <Route path="/" element={<LoginComponent setToken={setToken} authStatus={authStatus} logout={logout}/>} />
+          <Route exact path="/home" element={<LoginComponent setToken={setToken} setAuthStatus={setAuthStatus} logout={logout}/>} />
           <Route path="/sign-up" element={<SignUpComponent authStatus={authStatus} logout={logout}/>} />
           </>
           }
       </Routes>
+       }
       </div>
       </ApolloProvider> 
   );

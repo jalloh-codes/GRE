@@ -154,8 +154,7 @@ const resolver = {
             
             VerifyAuthorization(req, 'createProperty')
             
-            let auth = req.auth
-
+            const auth = req.auth
             const Newstudio =  new Property({
                 lister: auth._id,
                 images: args.input.images,

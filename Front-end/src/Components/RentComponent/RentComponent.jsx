@@ -9,7 +9,6 @@ import { SearchComponent } from "../Header/searchComponent/SearchComponent";
 import { SingleHome } from "../SingleHome/SingleHome";
 import { BookingDates } from "../BookingDates/BookingDates";
 
-
 import pict0 from "../../pictures/pict1.webp";
 import pict1 from "../../pictures/pict2.webp";
 import pict2 from "../../pictures/pict3.webp";
@@ -37,6 +36,8 @@ export const RentComponent = () => {
     const [typeHome, setTypeHome] = useState("");
     //post will hold the data from the backend
     const [post, setPost] = React.useState(null);
+
+
 
     React.useEffect(() => {
         axios.get(baseURL).then((response) => {

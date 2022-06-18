@@ -62,19 +62,14 @@ export const RentListingComponent = ({authStatus, logout}) => {
                 commune: commune,
                 images: images,
                 descriptions: descriptions,
-    
             }
         }).then(res =>{
-            console.log(res.data);
             const data  = res.data.createProperty
             setOnSuccess(data['message'])
         }).catch(err =>{
             setOnError(err["message"])
-            console.log(err);
         })
     }
-
-    console.log(images);
 
     if(loading){
         return

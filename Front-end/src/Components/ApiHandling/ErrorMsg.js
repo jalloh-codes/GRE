@@ -1,22 +1,18 @@
-import React, {useState,useEffect} from  'react'
+import React, {useState,} from  'react'
 import {Alert} from 'react-bootstrap';
  
-const ErrorMSg = ({msg, setOnError}) =>{
+const ErrorMSg = ({msg}) =>{
     const [show, setShow] = useState(true);
-    useEffect(()=>{
-      if(!show){
-        setOnError('')
-      }
-    })
-
+  
     if (show) {
       return (
-        <Alert variant="danger" onClose={() => setShow(!show)} dismissible>
+        <Alert variant="danger" onClose={() => setShow(false)} dismissible>
           <Alert.Heading>Error!</Alert.Heading>
           <p>{msg}</p>
         </Alert>
       );
     }
+    // return <Button onClick={() => setShow(true)}>Show Alert</Button>;
   }
   
   export default ErrorMSg

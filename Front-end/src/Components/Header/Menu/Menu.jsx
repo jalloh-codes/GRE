@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Menu.css"
-import "semantic-ui-css/semantic.min.css";
+// import "semantic-ui-css/semantic.min.css";
 
 
 

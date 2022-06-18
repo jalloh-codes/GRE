@@ -12,7 +12,7 @@ import ErrorMSg from '../ApiHandling/ErrorMsg';
 import {LOGIN} from '../Api/mutation'
 import { useNavigate} from 'react-router-dom'
 
-export const LoginComponent = ({setToken, authStatus}) => {
+export const LoginComponent = ({setToken, setAuthStatus}) => {
 
     const [login, {loading}] = useMutation(LOGIN)
     const [email, setEmail] = useState('')
@@ -30,6 +30,7 @@ export const LoginComponent = ({setToken, authStatus}) => {
         .then(res =>{
             const data  = res.data.login
             setToken(data.token)
+            setAuthStatus(true)
             localStorage.setItem('user', JSON.stringify(data.user))
             return navigate('/makeChoice')
         }).catch(err=>{
@@ -40,7 +41,7 @@ export const LoginComponent = ({setToken, authStatus}) => {
     return (
         <div className="App">
             <Header />
-            {onError && <ErrorMSg msg={onError} />}
+            {onError && <ErrorMSg msg={onError} setOnError={setOnError}/>}
             {loading ?
             <Loading />:
             <Form className="Login_form_container" onSubmit={submit}>
