@@ -14,14 +14,14 @@ import { useNavigate} from 'react-router-dom'
 
 export const LoginComponent = ({setToken, setAuthStatus}) => {
 
-    const [login, {loading}] = useMutation(LOGIN)
+    const [Login, {loading}] = useMutation(LOGIN)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [onError, setOnError]  = useState('')
     const navigate = useNavigate()
     const submit = (e) =>{
         e.preventDefault();
-        login({
+        Login({
             variables:{
                 email: email,
                 password: password,
