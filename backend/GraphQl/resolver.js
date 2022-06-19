@@ -107,7 +107,7 @@ const resolver = {
         })
     },
     
-    Login: async (args, req) =>{
+    Login: async (args, req) =>{ 
         const email = args.email
         const password = args.password
         
@@ -343,16 +343,146 @@ const resolver = {
     },
 
     // Air BnB
-    getAirBnB: async (args, req) =>{
-        
-    },
+    getAirBnb: async (args, req) =>{
+        const searchInput = args.input
 
-    checkoutHome: async (args, req) =>{
-        //place: ID, from: String
-        const from = ''
+        var search
+        var properties
+        let match = {
+            active: true
+        }
+        
+        if(searchInput != undefined){
+            const location = searchInput.location
+            const priceMin = searchInput.priceMin
+            const priceMax = searchInput.priceMax
+            const bedMin =  searchInput.bedMin
+            const bedMax = searchInput.bedMax
+            const bathMin = searchInput.bathMin
+            const bathMax = searchInput.bathMax 
+            const parking =  searchInput.parking 
+            const airCondition = searchInput.airCondition
+            const wifi  = searchInput.wifi
+            const furnished = searchInput.furnished
+            const propertyType = searchInput.propertyType
+            var start =  searchInput.start
+            var end = searchInput.end
+
+
+            if(priceMin != undefined || priceMax != undefined){
+                let price =  {'details.price': {}}
+                if(priceMin != undefined){
+                    Object.assign(price['details.price'], {"$gte" : priceMin})
+                }
+                if(priceMax != undefined){
+                    Object.assign(price['details.price'], {"$lte" : priceMax})
+                }
+                Object.assign(match, price)
+            }
+            if(bedMin != undefined || bedMax != undefined){
+                let bed =  { 'details.bed': {}}
+                if(bedMin != undefined){
+                    Object.assign(bed['details.bed'], {"$gte" : bedMin})
+                }
+                if(bedMax != undefined){
+                    Object.assign(bed['details.bed'], {"$lte" : bedMax})
+                }
+                Object.assign(match, bed)
+            }
+
+            if(bathMin != undefined || bathMax != undefined){
+                let bath =  {'details.bath': {}}
+                if(bathMin != undefined){
+                    Object.assign(bath['details.bath'], {"$gte" : bathMin})
+                }
+                if(bathMax != undefined){
+                    Object.assign(bath['details.bath'], {"$lte" : bathMax})
+                }
+                Object.assign(match, bath)
+            }
+
+            if(parking != undefined){
+                const data = {'details.parking': parking}
+                Object.assign(match, data);
+            }
+            if(airCondition != undefined){
+                const data = {'details.airCondition': airCondition}
+                Object.assign(match, data);
+            }
+            if(wifi != undefined){
+                const data = {'details.wifi': wifi}
+                Object.assign(match, data);
+            }
+            if(furnished != undefined){
+                const data = {'details.furnished': furnished}
+                Object.assign(match, data);
+            }
+            if(propertyType != undefined){
+                const data = {propertyType: propertyType}
+                Object.assign(match, data)
+            }
+            if(location != undefined){
+                search = { $search: {index: 'airbnb',
+                    text: { query: location,
+                        path: {'wildcard': '*'}}
+                }}
+                
+            }
+        }
+        const auth = req.auth
+            
+        // if (req.isAuth && auth.authorization.includes('getProperty')){
+            const compute = search ? [search,{"$match": match},
+            {
+                "$lookup" : { 
+                    "from" : "users", 
+                    "localField" : "lister", 
+                    "foreignField" : "_id",
+                    pipeline: [
+                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+                    ], 
+                    "as" : "lister"
+                }
+            },
+            {"$unwind": "$lister"},{
+                "$lookup":{
+                    "from": "reservations",
+                    "localField": "reservation",
+                    "foreignField": "_id",
+                    pipeline:[{$match:
+                        {
+                        reservation:{
+                            $elemMatch:{
+                                start_date:{gte: start}
+                            }
+                        }
+                    }
+                }],
+                    "as": "reservation"
+                }
+            }] :[{"$match": match},
+            {
+                "$lookup" : { 
+                    "from" : "users", 
+                    "localField" : "lister", 
+                    "foreignField" : "_id",
+                    pipeline: [
+                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+                    ], 
+                    "as" : "lister"
+                }
+            },
+            {"$unwind": "$lister"}]
+            airbnb =await  AirBnB.aggregate(compute,{ 
+                "allowDiskUse" : false
+            })
+        // }
+        return {
+            airbnb: airbnb,
+        }
     }
 
-
+ 
 }
 
 module.exports = resolver

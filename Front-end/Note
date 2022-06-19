@@ -1,1 +1,29 @@
 semantic-ui-css ERROR, I removed it. 
+
+
+
+
+Pavel_Duchovny
+MongoDB Employee
+t:
+
+var from_date=ISODate('2021-08-01')
+var to_date=ISODate('2021-08-19')
+
+db.hotels.find({
+  $and : [ {bookings : {$elemMatch : {
+
+    $or: [
+        { from: { $gte: to_date} },
+        { to: { $lte: from_date }}
+    ]
+
+  }}},  {bookings : { $not :  {$elemMatch : {
+  
+    $or: [
+        { from: { $gte: from_date, $lte : to_date } },
+        { to: { $lte: to_date , $gte :  from_date}}
+    ]
+
+  }}  } }]
+})

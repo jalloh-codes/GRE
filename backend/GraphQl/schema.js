@@ -142,13 +142,33 @@ module.exports = buildSchema(`
         parking: Boolean
     }
 
+    input searchAirBnb{
+        start: String
+        end: String
+        location: String
+        priceMin: Float
+        priceMax: Float
+        bedMin: Int
+        bedMax: Int
+        bathMin: Int
+        bathMax: Int
+        parking: Boolean
+        airCondition: Boolean
+        wifi: Boolean
+        furnished: Boolean
+        propertyType: String
+    }
+
     type Status{
         status: Boolean
         message: String
     }
 
     type listing{
-        properties:  [Property]
+        properties: [Property]
+    }
+    type ListingAirBnb{
+        airbnb: [AirBnB]
     }
 
     type AuthPayload {
@@ -158,6 +178,7 @@ module.exports = buildSchema(`
     
     type RootQuery {
         getProperty(input: search): listing
+        getAirBnb(input: searchAirBnb): ListingAirBnb
     }
 
     type RootMutation {
