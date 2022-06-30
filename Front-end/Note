@@ -1,3 +1,5 @@
+const AirBnB = require("../backend/Models/AirBnB")
+
 semantic-ui-css ERROR, I removed it. 
 
 
@@ -27,3 +29,53 @@ db.hotels.find({
 
   }}  } }]
 })
+
+
+$or:[
+  {$and:[
+        {$and:[{start_date:{$lte: start}}, {end_date:{$gte: start}}]},
+        {$and:[{end_date:{$gte: end}}, {end_date:{$gte: end}}]}
+  ]},
+  {$and:[{start_date:{$lte: end}},{end_date:{$gte: end}}]} ,
+  {$and:[{start_date:{$lte: start}},{end_date:{$gte: start}}]},
+  {$and:[
+    {$and:[{start_date:{$gte: start}},{start_date:{$lte:end}}]},
+    {$and:[{end_date:{$lte:end}},{end_date:{$lte: end}}]}
+  ]}
+]
+
+   // {$and:[{start_date:{$gt: start}},{end_date:{$gt: start}}]},]
+
+
+
+   //Acessing AirBnB
+`
+query getAirBnb($start: ISODate, $end: String, $propertyType: String, $location: String, $wifi: Boolean, $priceMin: Float, $priceMax: Float, $bedMin: Int, $bedMax: Int, $bathMin: Int, $bathMax: Int, $parking: Boolean){
+  getAirBnb(input:{start: $start, end: $end,propertyType: $propertyType, location: $location, wifi: $wifi, priceMin: $priceMin, priceMax: $priceMax, bedMin: $bedMin, bedMax: $bedMax, bathMin: $bathMin, bathMax: $bathMax, parking: $parking}){
+    airbnb{
+      _id
+      active
+      loc {
+        region
+        commune
+        lat
+        lng
+      }
+      propertyType
+      details {
+        studio
+        length
+        width
+        parking
+        built
+        airCondition
+        wifi
+        furnished
+        price
+        parking
+      }
+      descriptions
+    }
+  }
+}
+`

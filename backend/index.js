@@ -10,7 +10,7 @@ const auth = require('./middleware/auth')
 require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
-
+const { GraphQLDateTime } = require('graphql-iso-date')
 const corsOptions = {
   origin: ['http://192.168.1.32:3000', 'http://localhost:3000'],
   optionsSuccessStatus: 200,
@@ -28,6 +28,7 @@ app.use('/gre', graphqlHTTP({
   schema: schema,
   rootValue: resolver,
   graphiql: true,
+  ISODate: GraphQLDateTime,
   pretty: true
 }))
 

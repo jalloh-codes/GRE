@@ -108,3 +108,19 @@ const schemaAirBnB = new Schema({
 
 
 module.exports = AirBnB = mongoose.model('AirBnB', schemaAirBnB)
+
+
+
+// images: [
+//     {
+//         url: String,
+//         public_id: String
+//     }
+// ],
+
+// availability: [
+//     {
+//         from: String,
+//         to:	  String
+//     }
+// ],

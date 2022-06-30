@@ -365,8 +365,8 @@ const resolver = {
             const wifi  = searchInput.wifi
             const furnished = searchInput.furnished
             const propertyType = searchInput.propertyType
-            var start =  searchInput.start
-            var end = searchInput.end
+            var start = new Date(searchInput.start)
+            var end = new Date(searchInput.end)
 
 
             if(priceMin != undefined || priceMax != undefined){
@@ -430,7 +430,6 @@ const resolver = {
             }
         }
         const auth = req.auth
-            
         // if (req.isAuth && auth.authorization.includes('getProperty')){
             const compute = search ? [search,{"$match": match},
             {
@@ -444,23 +443,30 @@ const resolver = {
                     "as" : "lister"
                 }
             },
-            {"$unwind": "$lister"},{
+            {$unwind: "$lister"},
+            {
                 "$lookup":{
                     "from": "reservations",
                     "localField": "reservation",
                     "foreignField": "_id",
-                    pipeline:[{$match:
-                        {
-                        reservation:{
-                            $elemMatch:{
-                                start_date:{gte: start}
-                            }
-                        }
-                    }
-                }],
+                    pipeline:[{$match:{
+                        $or:[
+                            {$and:[
+                                  {$and:[{start_date:{$lte: start}}, {end_date:{$gte: start}}]},
+                                  {$and:[{end_date:{$gte: end}}, {end_date:{$gte: end}}]}
+                            ]},
+                            {$and:[{start_date:{$lte: end}},{end_date:{$gte: end}}]} ,
+                            {$and:[{start_date:{$lte: start}},{end_date:{$gte: start}}]},
+                            {$and:[
+                              {$and:[{start_date:{$gte: start}},{start_date:{$lte:end}}]},
+                              {$and:[{end_date:{$lte:end}},{end_date:{$lte: end}}]}
+                            ]}
+                          ]
+                    }}],
                     "as": "reservation"
                 }
-            }] :[{"$match": match},
+
+            }]:[{"$match": match},
             {
                 "$lookup" : { 
                     "from" : "users", 
@@ -473,10 +479,16 @@ const resolver = {
                 }
             },
             {"$unwind": "$lister"}]
-            airbnb =await  AirBnB.aggregate(compute,{ 
+            let result =await  AirBnB.aggregate(compute,{ 
                 "allowDiskUse" : false
             })
-        // }
+            let airbnb = []
+            await result.forEach((item)=>{
+                if(item.reservation.length === 0){
+                    console.log(item._id);
+                    airbnb.push(item)
+                }
+            })
         return {
             airbnb: airbnb,
         }
@@ -484,6 +496,5 @@ const resolver = {
 
  
 }
-
+//,{$unwind: "$reservation"}
 module.exports = resolver
-

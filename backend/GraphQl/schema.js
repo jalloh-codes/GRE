@@ -1,6 +1,9 @@
 const {buildSchema } = require('graphql')
+// const {} = require('./scalarTypes')
 
 module.exports = buildSchema(`
+    scalar ISODate
+
     type Role{
         _id: ID!
         name: String
@@ -57,8 +60,6 @@ module.exports = buildSchema(`
     type AirBnB{
         _id: ID
         lister: Lister
-        start_date: String
-        end_date: String
         reservation: [Reservation]
         videos: [String]
         loc: Location
@@ -143,7 +144,7 @@ module.exports = buildSchema(`
     }
 
     input searchAirBnb{
-        start: String
+        start: ISODate
         end: String
         location: String
         priceMin: Float
