@@ -1,6 +1,27 @@
-// const { GraphQLScalarType } = require('graphql')
+const { GraphQLScalarType, GraphQLError } = require('graphql')
 const {GraphQLDateTime} = require('graphql-iso-date')
+const AllowRoles = require('../Config/AllowRoles');
+var roles = Object.keys(AllowRoles)
+// check if roles is valid
+const validRole = (value) =>{
+    const capitalizeValue = value.charAt(0).toUpperCase() + value.slice(1);
+    if(typeof capitalizeValue !== 'string'){
+        throw new GraphQLError("Value must be a string")
+    }
+    if(!roles.includes(capitalizeValue)){
+        throw new GraphQLError(`${value} Role not valid`)
+    }
+    return value
+}
 
+
+const GraphQRole = new GraphQLScalarType({
+    name: 'role',
+    description: "Valid Role types" + roles,
+    serialize: validRole,
+    parseValue: (value) => value,
+    parseLiteral: ast => ast.value
+})
 // const ScalarEmailConfig = {
 //     name: 'Email',
 //     description: 'A valid Email address',
@@ -22,13 +43,13 @@ const {GraphQLDateTime} = require('graphql-iso-date')
 // const GraphQlDate= new GraphQLScalarType(ScalarDateConfig)
 
 
-// module.exports = {GraphQlEmail, GraphQlDate}
+module.exports = GraphQRole
 
 
 
-const customScalarResolver = {
-    Date: GraphQLDateTime
-  };
+// const customScalarResolver = {
+//     Date: GraphQLDateTime
+//   };
 
 
-export default [customScalarResolver]
+// export default [customScalarResolver, GraphQRole]

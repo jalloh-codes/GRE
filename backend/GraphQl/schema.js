@@ -1,8 +1,8 @@
-const {buildSchema } = require('graphql')
+const {buildSchema} = require('graphql')
 // const {} = require('./scalarTypes')
 
 module.exports = buildSchema(`
-    scalar ISODate
+    scalar role 
 
     type Role{
         _id: ID!
@@ -14,7 +14,7 @@ module.exports = buildSchema(`
         firstname: String
         lastname: String
         email: String
-        password: String
+        role: String
         phoneNumber: String!
     }
     type Location{
@@ -76,7 +76,7 @@ module.exports = buildSchema(`
         end_date: String
         price: Float
         update_at: String
-    }
+    } 
 
     input createUser{
         firstname: String!
@@ -84,7 +84,7 @@ module.exports = buildSchema(`
         email: String!
         password: String!
         phoneNumber: String!
-        UserType: String!
+        UserType: role!
     }
 
     input createProperty{
@@ -144,7 +144,7 @@ module.exports = buildSchema(`
     }
 
     input searchAirBnb{
-        start: ISODate
+        start: String
         end: String
         location: String
         priceMin: Float
@@ -184,7 +184,7 @@ module.exports = buildSchema(`
 
     type RootMutation {
         createRole(name: String!): Status
-        signup(input: createUser): Status
+        SignUp(input: createUser): Status
         Login(email: String!, password: String!): AuthPayload
         createProperty(input: createProperty):Status
         createAirBnb(input: airbnbInput):Status

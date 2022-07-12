@@ -2,32 +2,55 @@ const User = require('../Models/User');
 const jwt  = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Property = require('../Models/Property')
-
-
-const Roles = require('../Models/Roles');
+const AllowRoles = require('../Config/AllowRoles')
 const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
 const { populate } = require('../Models/Roles');
 const AirBnB = require('../Models/AirBnB');
+const { GraphQLError } = require('graphql')
+// const {} = require
+const GraphQRole = require('./scalarTypes')
 
-
-// verify authantication and authorization
-const VerifyAuthorization =(req, authorization) =>{
-   
-    if(!req.isAuth) throw new Error('Authentication Failed')
-    if(!req.auth.authorization.includes(authorization)) throw new Error('Not Authorised')
+// Validate email & password
+const validate = (email, password) =>{
+    const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    if(email){
+        if(!emailRegex.test(email)) throw new Error("Email is not valid format. Ex: example@mail.com")
+    }
+    if(password){
+        const strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,20})')
+        const mediumPassword = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))')
+        
+        if(!strongPassword.test(password) || !mediumPassword.test(password)) throw new Error("Password is not valid. Valid format,[Aa-zZ, 0-9, !@#$%^&*]")
+    }
 }
 
+// get key by a value
+const getObjKey = (obj, value) => {
+    return Object.keys(obj).find(key => obj[key] === value);
+}
+
+// verify authantication and authorization
+const VerifyAuthorization = async (req, allowed) =>{
+    const id =  req._id
+    const user = await User.findById(id, {verified: 1, role:1});
+
+    const role = AllowRoles[req.authorization]
+    
+    if(role !== user.role) throw new GraphQLError("Role not valid")
+    return req.authorization
+}
+  
 const user = async (id) =>{
     const user = await User.findOne({_id: id},{password: 0});
     return user
 }
 const AuthPayloadUser = async (email) =>{
-    const user = User.findOne({email: email}, {phoneNumber: 0, __v: 0}).populate('roles', 'name -_id')
-
-    return user 
+    const user = await User.findOne({email: email})
+    if (!user) throw new GraphQLError("Email or Password is inccorect!");
+    if(!user.verified) throw new GraphQLError("Account not verified")
+    return user
 }
-
 
 const building =  async (bdID) =>{
     const buildings  = await Building.findOne({_id: bdID})
@@ -48,89 +71,62 @@ const allBuildings = async () =>{
         }
     })
 }
-const unit =  async () =>{
-    const units  = await Unit.find()
-
-    return units.map(uni =>{
-        return{
-            ...uni._doc,
-            building: building.bind(this, uni.building)
-        }
-    })
-}
 
 const resolver = {
-
-    createRole: async (args, req) =>{
-        const newRoles = new Roles({
-            name:  args.name
-        })
-
-        await newRoles.save()
-        .then(res =>{
-            return{
-                status: true
-            }
-        })
-        .catch(error =>{
-            throw Error(error)
-        })
-    },
 
     SignUp: async (args, req) =>{
 
         const userType = args.input.UserType
-        let roles = []
-        if (userType === 'Listing'){
-            roles = await Roles.find({name: {$in: Listing}},{_id: 1})
-        }else if (userType === 'BuyOrRent'){
-            roles = await Roles.find({name: {$in: BuyOrRent}}, {_id: 1})
-        }
-        if(roles.length === 0) throw new Error('No Roles provided')
-        const password = await bcrypt.hash(args.input.password, 12);
-        const newUser =new  User({
-            email: args.input.email,
+        const email =  args.input.email
+        const pass = args.input.password
+        // Verify role ang get the ROLE value
+        const capitalizeRole= userType.charAt(0).toUpperCase() + userType.slice(1);
+        if(!Object.keys(AllowRoles).includes(capitalizeRole)) throw new GraphQLError('Role is not valid')
+        const roleType =  AllowRoles[capitalizeRole]
+
+        validate(email, pass)
+        const password = await bcrypt.hash(pass, 12);
+        const newUser = new User({
+            email: email,
             firstname: args.input.firstname,
             lastname: args.input.lastname,
-            UserType: args.input.UserType,
+            role: roleType,
             password: password,
-            roles: roles,
             phoneNumber: args.input.phoneNumber
         })
+
         let status = true
         await newUser.save()
-        .then((res) =>{
-            return {status: true}
+        .then((_) =>{
+            return {
+                status: true,
+                message: `User ${newUser.firstname} created`}
         }).catch(error =>{
             status = false
-            throw Error(error, {status: status})
+            throw new  GraphQLError(error, {status: status})
         })
     },
     
     Login: async (args, req) =>{ 
         const email = args.email
         const password = args.password
-        
-        let authuser =  await AuthPayloadUser(email)
-
-        if (!authuser) throw new Error("Email is incorect");
-
+        validate(email)
+        const authuser = await AuthPayloadUser(email)
+       
         const authanticate = await bcrypt.compareSync(password, authuser.password)
-        if(!authanticate) throw new Error("Password is incorect")
-        if(!authuser.verified) throw new Error("Account not verified")
-        let authorization =await  authuser.roles.map(e =>  e['name']);
+        authuser.password = null
+        if(!authanticate) throw new  GraphQLError("Email or Password is inccorect!")
 
-        // delete authuser.password
+        const role = getObjKey(AllowRoles, authuser.role)
         const payload = {
             _id: authuser._id,
             email: authuser.email,
             firstname: authuser.firstname,
             lastname: authuser.lastname,
             created: authuser.created,
-            admin: authuser.admin,
-            authorization: authorization
+            authorization: role
         }
-
+       
         //token expire in one year
         const token = jwt.sign(
             payload,
@@ -151,10 +147,10 @@ const resolver = {
 
     createProperty: async (args, req) =>{
         try{
-            
-            VerifyAuthorization(req, 'createProperty')
-            
             const auth = req.auth
+            const verify = await VerifyAuthorization(auth)
+            if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task")
+        
             const Newstudio =  new Property({
                 lister: auth._id,
                 images: args.input.images,
@@ -258,36 +254,36 @@ const resolver = {
         }
         const auth = req.auth
             
-        if (req.isAuth && auth.authorization.includes('getProperty')){
-            const compute = search ? [search,{"$match": match},
-            {
-                "$lookup" : { 
-                    "from" : "users", 
-                    "localField" : "lister", 
-                    "foreignField" : "_id",
-                    pipeline: [
-                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
-                    ], 
-                    "as" : "lister"
-                }
-            },
-            {"$unwind": "$lister"}] :[{"$match": match},
-            {
-                "$lookup" : { 
-                    "from" : "users", 
-                    "localField" : "lister", 
-                    "foreignField" : "_id",
-                    pipeline: [
-                        {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
-                    ], 
-                    "as" : "lister"
-                }
-            },
-            {"$unwind": "$lister"}]
-            properties =await  Property.aggregate(compute,{ 
-                "allowDiskUse" : false
-            })
-        }else{
+        // if (req.isAuth && auth.authorization.includes('getProperty')){
+            // const compute = search ? [search,{"$match": match},
+            // {
+            //     "$lookup" : { 
+            //         "from" : "users", 
+            //         "localField" : "lister", 
+            //         "foreignField" : "_id",
+            //         pipeline: [
+            //             {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+            //         ], 
+            //         "as" : "lister"
+            //     }
+            // },
+            // {"$unwind": "$lister"}] :[{"$match": match},
+            // {
+            //     "$lookup" : { 
+            //         "from" : "users", 
+            //         "localField" : "lister", 
+            //         "foreignField" : "_id",
+            //         pipeline: [
+            //             {$project: {_id: 1, email: 1, firstname:1, lastname:1}}
+            //         ], 
+            //         "as" : "lister"
+            //     }
+            // },
+            // {"$unwind": "$lister"}]
+            // properties =await  Property.aggregate(compute,{ 
+            //     "allowDiskUse" : false
+            // })
+        // }else{
             
             const compute = search ? [search,{"$match": match}] :[{"$match": match}] 
             
@@ -295,7 +291,7 @@ const resolver = {
                 "allowDiskUse" : false
             })
             
-        }
+        // }
         return {
             properties: properties,
         }
@@ -304,10 +300,12 @@ const resolver = {
     // Create Airbnb Property
     createAirBnb: async (args, req) =>{
         try{
-            
-            VerifyAuthorization(req, 'createAirBnb')
+            const auth = req.auth 
+            const verify = await VerifyAuthorization(auth)
+            if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task");
+
             const inputs = args.input
-            const auth = req.auth
+
             const NewAirbnb=  new AirBnB({
                 lister: auth._id,
                 name: inputs.name,
@@ -344,8 +342,8 @@ const resolver = {
 
     // Air BnB
     getAirBnb: async (args, req) =>{
+      
         const searchInput = args.input
-
         var search
         var properties
         let match = {
@@ -429,7 +427,6 @@ const resolver = {
                 
             }
         }
-        const auth = req.auth
         // if (req.isAuth && auth.authorization.includes('getProperty')){
             const compute = search ? [search,{"$match": match},
             {
@@ -485,15 +482,14 @@ const resolver = {
             let airbnb = []
             await result.forEach((item)=>{
                 if(item.reservation.length === 0){
-                    console.log(item._id);
                     airbnb.push(item)
                 }
             })
         return {
             airbnb: airbnb,
         }
-    }
-
+    },
+    role: GraphQRole
  
 }
 //,{$unwind: "$reservation"}

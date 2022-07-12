@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const http =  require('http');
 // const { graphqlHTTP } = require('express-graphql');
+
 const schema = require('./GraphQl/schema')
 const resolver = require('./GraphQl/resolver')
 const auth = require('./middleware/auth')
@@ -11,6 +12,7 @@ require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
 const { GraphQLDateTime } = require('graphql-iso-date')
+const GraphQRole = require('./GraphQl/scalarTypes')
 const corsOptions = {
   origin: ['http://192.168.1.32:3000', 'http://localhost:3000'],
   optionsSuccessStatus: 200,
@@ -28,7 +30,7 @@ app.use('/gre', graphqlHTTP({
   schema: schema,
   rootValue: resolver,
   graphiql: true,
-  ISODate: GraphQLDateTime,
+  // role: GraphQRole,
   pretty: true
 }))
 
