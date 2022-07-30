@@ -7,7 +7,8 @@ const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
 const { populate } = require('../Models/Roles');
 const AirBnB = require('../Models/AirBnB');
-const { GraphQLError } = require('graphql')
+const { GraphQLError } = require('graphql');
+const Mailer = require('../Mailer/CodeMailer');
 // const {} = require
 const GraphQRole = require('./scalarTypes')
 
@@ -112,9 +113,11 @@ const resolver = {
         const password = args.password
         validate(email)
         const authuser = await AuthPayloadUser(email)
+        
        
         const authanticate = await bcrypt.compareSync(password, authuser.password)
         authuser.password = null
+        Mailer(authuser)
         if(!authanticate) throw new  GraphQLError("Email or Password is inccorect!")
 
         const role = getObjKey(AllowRoles, authuser.role)

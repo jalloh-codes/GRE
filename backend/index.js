@@ -11,7 +11,6 @@ const auth = require('./middleware/auth')
 require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
-const { GraphQLDateTime } = require('graphql-iso-date')
 const GraphQRole = require('./GraphQl/scalarTypes')
 const corsOptions = {
   origin: ['http://192.168.1.32:3000', 'http://localhost:3000'],

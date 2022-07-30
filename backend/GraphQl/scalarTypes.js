@@ -1,5 +1,4 @@
 const { GraphQLScalarType, GraphQLError } = require('graphql')
-const {GraphQLDateTime} = require('graphql-iso-date')
 const AllowRoles = require('../Config/AllowRoles');
 var roles = Object.keys(AllowRoles)
 // check if roles is valid
