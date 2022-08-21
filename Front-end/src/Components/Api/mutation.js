@@ -2,18 +2,36 @@ import { gql} from "@apollo/client";
 // $email: String!, $password: String!, $UserType: String!, $phoneNumber: String!
 //, email: $email, password:$password, UserType: $UserType, phoneNumber: $phoneNumber
 export const SIGN_UP = gql`
-mutation signup($email: String!, $password: String!, $firstname: String!, $lastname: String!, $phoneNumber: String!, $UserType: String!){
-  signup(input:{email: $email, password: $password, firstname: $firstname, lastname: $lastname, phoneNumber: $phoneNumber, UserType: $UserType}){
+mutation SignUp($email: String!, $password: String!, $firstname: String!, $lastname: String!, $phoneNumber: String!, $UserType: String!){
+  SignUp(input:{email: $email, password: $password, firstname: $firstname, lastname: $lastname, phoneNumber: $phoneNumber, UserType: $UserType}){
     status
     message
   }
 }
 `
 
+export const VERIFY_ACCOUNT = gql`
+mutation VerifyAccount($user: String!, $code:String!){
+  VerifyAccount(user: $user, code: $code){
+    status
+    message
+  }
+}
+`
+
+export const SEND_VERIFICATION = gql`
+mutation  sendVerification($email: String!){
+  sendVerification(email: $email){
+      status
+      message
+    }
+}
+`
+
 
 export const LOGIN = gql`
-mutation login($email: String!, $password: String!){
-  login(email: $email, password:$password){
+mutation Login($email: String!, $password: String!){
+  Login(email: $email, password:$password){
     token
     user{
         _id

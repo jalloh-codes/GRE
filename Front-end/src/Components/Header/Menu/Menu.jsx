@@ -1,11 +1,22 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Link } from "react-router-dom";
 import "./Menu.css"
+import {authContext} from '../../../Context/authContext'
 // import "semantic-ui-css/semantic.min.css";
+import {useToken} from '../../../Components/Api/useToken';
+import {useNavigate} from 'react-router-dom';
 
+export const Menu = (props) => {
+    const state =  useContext(authContext);
+    let navigate =  useNavigate();
 
-
-export const Menu = () => {
+    const Logout = async (e) =>{
+        e.preventDefault();
+        await localStorage.removeItem('token');
+        await localStorage.removeItem('authanticated');
+        await localStorage.removeItem('user');
+        navigate('/login')
+    }
     return (
 
         <div class="ui menu header-menu">
@@ -24,7 +35,10 @@ export const Menu = () => {
             <Link to="/contactUs" class="item">
                 Contact US
             </Link>
-
+            {state.authanticated ?
+            <div class="right menu">
+                <Link to="/signUp" class="SignUp" onClick={(e) => Logout(e)}>Log out</Link>
+            </div>:
             <div class="right menu">
                 <div id="google_translate_element"></div>
                 <Link to="/login" class="Login">
@@ -34,7 +48,7 @@ export const Menu = () => {
                     Sign up
                 </Link>
             </div>
-
+                }
         </div >
     );
 }

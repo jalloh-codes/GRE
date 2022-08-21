@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { HeaderMainContainer } from './Components/Header/HeaderMainContainer';
 import BodyMainContainer from './Components/Body/BodyMainContainer'
 import { FooterMainContainer } from './Components/Footer/FooterMainContainer';
@@ -11,11 +11,9 @@ import { BuyComponent } from './Components/BuyComponent/BuyComponent';
 import { SingleHome } from './Components/SingleHome/SingleHome'
 import { SimpleMap } from './Components/SingleHome/SimpleMap';
 import { ContactComponent } from './Components/ContactComponent/ContactComponent';
-import {
-  Routes,
-  Route
-} from 'react-router-dom';
+import { Routes, Route} from 'react-router-dom';
 import {useToken} from './Components/Api/useToken';
+import {authContext} from  './Context/authContext';
 import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
   import {onError} from '@apollo/client/link/error';
@@ -30,6 +28,11 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
   
     if (networkError){
       console.log(`[Network error]: ${networkError}`);
+      networkError.map(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
     }
   });
 
@@ -40,14 +43,21 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
 
   const authMiddleware = new ApolloLink((operation, forward) => {
     // add the authorization to the headers
-    const token = localStorage.getItem('token');
-  
-    operation.setContext(({ headers = {} }) => ({
-      headers: {
-        ...headers,
-        authorization: JSON.parse(token) || null,
-      }
-    }));
+    const { token } = useToken();
+    if(token.authanticated){
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers,
+          authorization: token.token,
+        }
+      }));
+    }else{
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers
+        }
+      }));
+    }
   
     return forward(operation);
   })
@@ -59,14 +69,18 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
 
 function App() {
 
-  const { token, setToken, logout} = useToken();
+  const { token} = useToken();
   const [authStatus, setAuthStatus] =  useState(false)
+  const [authanticated, setAuthanticated] = useState(false)
 
+  useEffect(() =>{
+    setAuthanticated(token.authanticated)
+  },[token])
+  
   return (
+    <authContext.Provider value={{authanticated}}>
     <ApolloProvider  client={client}>
     <div className="App">
-
-
       <Routes>
         <Route path="/" element={
         <>
@@ -85,10 +99,7 @@ function App() {
       </Routes>
     </div>
     </ApolloProvider> 
+    </authContext.Provider>
   );
 }
-
 export default App;
-
-
-// react-google-maps
