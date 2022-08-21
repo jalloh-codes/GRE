@@ -78,13 +78,18 @@ module.exports = buildSchema(`
         update_at: String
     } 
 
+    type Verify{
+        user: User
+        code: String
+    }
+
     input createUser{
         firstname: String!
         lastname: String!
         email: String!
         password: String!
         phoneNumber: String!
-        UserType: role!
+        UserType: String!
     }
 
     input createProperty{
@@ -176,6 +181,8 @@ module.exports = buildSchema(`
         token: String!
         user: Lister
     }
+
+
     
     type RootQuery {
         getProperty(input: search): listing
@@ -189,6 +196,9 @@ module.exports = buildSchema(`
         createProperty(input: createProperty):Status
         createAirBnb(input: airbnbInput):Status
         checkoutHome(place: ID, from: String): Status
+        sendVerification(email: String!): Status
+        resetPassword(oldPassword: String, newPassword: String!): Status
+        VerifyAccount(user: String!, code: String!): Status
     }
 
     schema{

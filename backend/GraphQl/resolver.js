@@ -7,17 +7,23 @@ const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
 const mongoose = require('mongoose');
 const { populate } = require('../Models/Roles');
 const AirBnB = require('../Models/AirBnB');
+const Verify = require('../Models/Verify')
 const { GraphQLError } = require('graphql');
-const Mailer = require('../Mailer/CodeMailer');
+// const Mailer = require('../Mailer/CodeMailer');
+const CodeMailer =  require('../Mailer/CodeMailer')
 // const {} = require
-const GraphQRole = require('./scalarTypes')
+const GraphQRole = require('./scalarTypes');
+const crypto =  require('crypto')
 
 // Validate email & password
-const validate = (email, password) =>{
+const validateEmail = (email) =>{
     const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     if(email){
         if(!emailRegex.test(email)) throw new Error("Email is not valid format. Ex: example@mail.com")
     }
+}
+
+const validatePassword = (password) =>{
     if(password){
         const strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,20})')
         const mediumPassword = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))')
@@ -25,6 +31,7 @@ const validate = (email, password) =>{
         if(!strongPassword.test(password) || !mediumPassword.test(password)) throw new Error("Password is not valid. Valid format,[Aa-zZ, 0-9, !@#$%^&*]")
     }
 }
+
 
 // get key by a value
 const getObjKey = (obj, value) => {
@@ -76,48 +83,66 @@ const allBuildings = async () =>{
 const resolver = {
 
     SignUp: async (args, req) =>{
+        try{
 
-        const userType = args.input.UserType
-        const email =  args.input.email
-        const pass = args.input.password
-        // Verify role ang get the ROLE value
-        const capitalizeRole= userType.charAt(0).toUpperCase() + userType.slice(1);
-        if(!Object.keys(AllowRoles).includes(capitalizeRole)) throw new GraphQLError('Role is not valid')
-        const roleType =  AllowRoles[capitalizeRole]
+            const userType = args.input.UserType
+            const email =  args.input.email
+            const pass = args.input.password
+            // Verify role ang get the ROLE value
+            const capitalizeRole= userType.charAt(0).toUpperCase() + userType.slice(1);
+            if(!Object.keys(AllowRoles).includes(capitalizeRole)) throw new GraphQLError('Role is not valid')
+            const roleType =  AllowRoles[capitalizeRole]
+        
+            validateEmail(email)
+            validatePassword(pass)
+            const password = await bcrypt.hash(pass, 12);
+            const newUser = new User({
+                email: email,
+                firstname: args.input.firstname,
+                lastname: args.input.lastname,
+                role: roleType,
+                password: password,
+                phoneNumber: args.input.phoneNumber
+            })
 
-        validate(email, pass)
-        const password = await bcrypt.hash(pass, 12);
-        const newUser = new User({
-            email: email,
-            firstname: args.input.firstname,
-            lastname: args.input.lastname,
-            role: roleType,
-            password: password,
-            phoneNumber: args.input.phoneNumber
-        })
+            
+            await newUser.save();
+            const random = crypto.randomUUID();
+            const code = random.substring(0, 8);
+            let file = '../Templates/codeMailer.hbs'
+            let locals={
+                email: newUser.email,
+                firstname: newUser.firstname,
+                lastname: newUser.lastname,
+                code: code
+            }
+            const hashCode = await bcrypt.hash(code, 12);
+            const newVerify =  new Verify({
+                user: newUser._id,
+                code: hashCode
+            });
+            await CodeMailer(file,  locals);
 
-        let status = true
-        await newUser.save()
-        .then((_) =>{
-            return {
+            await newVerify.save();
+
+            return{
                 status: true,
-                message: `User ${newUser.firstname} created`}
-        }).catch(error =>{
-            status = false
-            throw new  GraphQLError(error, {status: status})
-        })
+                message: `User account ${newUser.firstname} created. Check your email to verify your account.`
+            }
+        }catch(error){
+            throw Error(error, {status: false})
+        }
     },
-    
     Login: async (args, req) =>{ 
         const email = args.email
         const password = args.password
-        validate(email)
+        validateEmail(email)
         const authuser = await AuthPayloadUser(email)
         
        
         const authanticate = await bcrypt.compareSync(password, authuser.password)
         authuser.password = null
-        Mailer(authuser)
+        // Mailer(authuser)
         if(!authanticate) throw new  GraphQLError("Email or Password is inccorect!")
 
         const role = getObjKey(AllowRoles, authuser.role)
@@ -492,8 +517,83 @@ const resolver = {
             airbnb: airbnb,
         }
     },
-    role: GraphQRole
- 
+    role: GraphQRole,
+    sendVerification: async (args, req) =>{
+        try{
+            const email =  args.email
+            const user = await User.findOne({email: email},{_id: 1, email:1, firstname:1, lastname:1})
+            const verify = await Verify.findOne({user: user._id},{code:1})
+
+            const random = crypto.randomUUID();
+            const code = random.substring(0, 8);
+            let locals={
+                email: user.email,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                code: code
+            }
+            const hashCode = await bcrypt.hash(code, 12);
+            let file = '../Templates/codeMailer.hbs'
+            await CodeMailer(file, locals)
+            verify.code = hashCode;
+            await verify.save();
+            return{
+                status: true,
+                message: "Code sent to your email"
+            }
+        }catch(error){
+            throw Error(error, {status: false})
+        }
+    },
+    resetPassword: async (args, req) =>{
+        const auth = "62c57500e35f35e5cd731440" //req.auth 
+        const oldPassword =  args.oldPassword;
+        const newPassword = args.newPassword;
+        validatePassword(newPassword)
+        
+        const getUser =  await User.findById(auth,{password: 1});
+        
+        const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
+        if(!authanticate) throw new  GraphQLError("Password is inccorect!")
+
+        const password = await bcrypt.hash(newPassword, 12);
+      
+        getUser.password = password
+        await getUser.save()
+        .then(res =>{
+
+            return{
+                status:true,
+                message:'Password successfuly reset'
+            }
+        }).catch(error =>{
+            throw Error(error)
+        })
+        
+
+        
+    },
+    VerifyAccount: async (args, req) =>{ 
+        try{
+            const email = args.user;
+            const code = args.code
+            const user =  await User.findOne({email: email},{_id: 1, verified: 1})
+            const verify = await Verify.findOne({user: user._id},{code:1})
+            const authanticate = await bcrypt.compareSync(code, verify.code)
+            if(authanticate){
+                user.verified = true;
+                await user.save();
+                await Verify.deleteOne({_id: verify._id})
+            }
+            return{
+                status: true,
+                message: "Account verified"
+            }
+        }catch(error){
+            throw Error(error, {status: false})
+        }
+    }
+
 }
 //,{$unwind: "$reservation"}
 module.exports = resolver

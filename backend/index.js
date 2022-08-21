@@ -7,33 +7,28 @@ const http =  require('http');
 
 const schema = require('./GraphQl/schema')
 const resolver = require('./GraphQl/resolver')
-const auth = require('./middleware/auth')
+const authMiddleware = require('./middleware/auth')
 require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
-const GraphQRole = require('./GraphQl/scalarTypes')
 const corsOptions = {
   origin: ['http://192.168.1.32:3000', 'http://localhost:3000'],
   optionsSuccessStatus: 200,
   credentials: true 
 }
 //corsOptions
-app.use(cors())
+app.use(cors(corsOptions))
 const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
 
 
-app.use(auth);
+app.use(authMiddleware);
 app.use('/gre', graphqlHTTP({
   schema: schema,
   rootValue: resolver,
   graphiql: true,
-  // role: GraphQRole,
-  pretty: true
 }))
-
-
 
 // database connection
 mongoose.connect(db, {useUnifiedTopology: true, useNewUrlParser: true})
@@ -44,6 +39,9 @@ mongoose.connect(db, {useUnifiedTopology: true, useNewUrlParser: true})
     console.log("Cannot connect to the database!", err);
     process.exit();
 });
+
+
+
 // listen for requests
 server.listen(port, () => {
     console.log(`Server is running on port ${port}.`);
