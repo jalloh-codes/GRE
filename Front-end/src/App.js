@@ -4,7 +4,7 @@ import BodyMainContainer from './Components/Body/BodyMainContainer'
 import { FooterMainContainer } from './Components/Footer/FooterMainContainer';
 import './App.css';
 import { LoginComponent } from './Components/LoginComponent/LoginComponent';
-import { SignUpComponent } from './Components/SignUpComponent/SignUpComponent';
+import { SignUpComponent }from './Components/SignUpComponent/SignUpComponent';
 import { AboutComponent } from './Components/AboutUS/AboutComponent';
 import { RentComponent } from './Components/RentComponent/RentComponent';
 import { BuyComponent } from './Components/BuyComponent/BuyComponent';
@@ -14,20 +14,20 @@ import { ContactComponent } from './Components/ContactComponent/ContactComponent
 import { Routes, Route} from 'react-router-dom';
 import {useToken} from './Components/Api/useToken';
 import {authContext} from  './Context/authContext';
+import {Verification} from './Components/Verification/Verification'
 import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
-  import {onError} from '@apollo/client/link/error';
-
+import {onError} from '@apollo/client/link/error';
+import {ResetPassword} from './Components/ResetPassword/ResetPassword'
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
-      graphQLErrors.map(({ message, locations, path }) =>
-        console.log(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        ),
-      );
+      //graphQLErrors.map(({ message, locations, path }) => [{ Message: message, Location: locations, Path: path}]
+        //console.log(''
+         // `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+        //),
+      // );
   
     if (networkError){
-      console.log(`[Network error]: ${networkError}`);
       networkError.map(({ message, locations, path }) =>
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
@@ -75,10 +75,10 @@ function App() {
 
   useEffect(() =>{
     setAuthanticated(token.authanticated)
-  },[token])
+  },[token, authanticated])
   
   return (
-    <authContext.Provider value={{authanticated}}>
+    <authContext.Provider value={{authanticated, setAuthanticated}}>
     <ApolloProvider  client={client}>
     <div className="App">
       <Routes>
@@ -88,8 +88,10 @@ function App() {
               <BodyMainContainer />
               <FooterMainContainer />
         </>} />
+        <Route  path="verify" element={<Verification />} />
         <Route path="login" element={<LoginComponent />} />
         <Route path="signUp" element={<SignUpComponent />} />
+        <Route path="resetpassword" element={<ResetPassword />}/>
         <Route path="aboutUS" element={<AboutComponent />} />
         <Route path="rent" element={<RentComponent />} />
         <Route path="buy" element={<BuyComponent />} />

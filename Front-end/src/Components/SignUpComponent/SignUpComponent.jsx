@@ -8,10 +8,13 @@ import { FooterMainContainer } from '../Footer/FooterMainContainer';
 import {SIGN_UP} from '../Api/mutation';
 import { useMutation } from '@apollo/client';
 import {validateEmail, validatePassword, validMatch}  from '../../Functions/AuthFunction';
-import {Verification} from '../Verification/Verification'
+import {useToken} from  '../Api/useToken';
+import {useNavigate} from 'react-router-dom';
 export const SignUpComponent = () => {
 
-    const [SignUp, { loading}] = useMutation(SIGN_UP)
+    const { token } = useToken();
+    let navigate =  useNavigate();
+    const [SignUp, { loading, error}] = useMutation(SIGN_UP)
     const [email, setEmail] = useState('')
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
@@ -23,9 +26,10 @@ export const SignUpComponent = () => {
     const [emailError, setEmailError] = useState({messgae: null,success: false})
     const [passError, setPassError] = useState({messgae: null,success: false})
     const [matchError, setMatchError] = useState({messgae: null,success: false})
-    const [signUpStatus, setSignupStatus] =  useState(false);
-    const [verifyCode, setVerifyCode] = useState(String);
-    
+
+
+
+
     const submit = (e) =>{
         e.preventDefault();
         SignUp({
@@ -39,16 +43,20 @@ export const SignUpComponent = () => {
             }
         })
         .then(res =>{
-            
-            if(res.data.SignUp.status){
-                setSignupStatus(true);
-                localStorage.setItem("email", email)
+            const data = res.data.SignUp
+            if(data.account){
+                navigate('/verify', { state: { email: email, verification: data.verification}})
             }
         }).catch(err=>{
-            console.log(err);
             setOnError(err["message"])
         })
     }
+
+    useEffect(() =>{
+        if(token.token && token.authanticated){
+            navigate('/')
+        }
+    },[token])
 
     useEffect(() =>{
         if(email.length > 1){
@@ -56,8 +64,7 @@ export const SignUpComponent = () => {
             setEmailError(validEmail)
         }else{
             setEmailError('')
-            localStorage.setItem('email', email)
-            // console.log(localStorage.getItem('email'));
+            
         }
     },[email])
 
@@ -75,9 +82,6 @@ export const SignUpComponent = () => {
             const matchPass = validMatch(password, rePassword)
             setMatchError(matchPass)
         }
-        // else{
-            
-        // }
     },[rePassword])
 
     return (
@@ -85,7 +89,6 @@ export const SignUpComponent = () => {
             <div className="head_top_contains">
                 <HeaderTopContains />
             </div>
-            {!signUpStatus ?
             <Form className="Login_form_container" onSubmit={submit}>
                 <Form.Group className="mb-3">
                     <Form.Label>Firstname</Form.Label>
@@ -128,8 +131,6 @@ export const SignUpComponent = () => {
                 </Button>
 
             </Form>
-            :
-            <Verification getEmail={email}/>}
             <FooterMainContainer />
         </div>
     );

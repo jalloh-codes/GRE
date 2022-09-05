@@ -11,11 +11,11 @@ export const SearchComponent = ({ parentCallback }) => {
     };
     return (
 
-        <div class="ui category search">
-            <div class="ui icon input">
-                <input class="prompt" type="text" value={value}
+        <div className="ui category search">
+            <div className="ui icon input">
+                <input className="prompt" type="text" value={value}
                     placeholder="Search city..." onChange={handleChange} />
-                <i class="search icon"></i>
+                <i className="search icon"></i>
             </div>
 
         </div>

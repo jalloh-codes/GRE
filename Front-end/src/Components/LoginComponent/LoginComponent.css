@@ -16,3 +16,20 @@
     min-height:600px; 
     padding-top: 140px;
 }
+
+.center-text{
+    text-align: center;
+    margin: 15px 0;
+}
+
+.center-link{
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.center-link:hover{
+    text-decoration:underline;
+    color: #e30c0c;
+    font-size: 20px;
+}
