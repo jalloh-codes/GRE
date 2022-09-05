@@ -11,7 +11,7 @@ import Loading from '../ApiHandling/Loading';
 import ErrorMSg from '../ApiHandling/ErrorMsg';
 export const SignUpComponent = () => {
 
-    const [signup, { loading}] = useMutation(SIGN_UP)
+    const [SignUp, { loading}] = useMutation(SIGN_UP)
     const [email, setEmail] = useState('')
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
@@ -22,7 +22,7 @@ export const SignUpComponent = () => {
 
     const submit = (e) =>{
         e.preventDefault();
-        signup({
+        SignUp({
             variables:{
                 firstname: firstname,
                 lastname: lastname,
@@ -33,7 +33,7 @@ export const SignUpComponent = () => {
             }
         })
         .then(res =>{
-            console.log(res.login);
+            console.log(res.SignUp);
         }).catch(err=>{
             console.log(err);
             setOnError(err["message"])
