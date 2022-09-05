@@ -55,8 +55,8 @@ const user = async (id) =>{
 }
 const AuthPayloadUser = async (email) =>{
     const user = await User.findOne({email: email})
-    if (!user) throw new GraphQLError("Email or Password is inccorect!");
-    if(!user.verified) throw new GraphQLError("Account not verified")
+    if (!user) throw new GraphQLError(JSON.stringify({name:'account', message:'Account does not exists!'}))
+    if(!user.verified) throw new GraphQLError(JSON.stringify({name:'verify', message:'Verify your account!'}))
     return user
 }
 
@@ -106,7 +106,7 @@ const resolver = {
             })
 
             
-            await newUser.save();
+            const account = await newUser.save();
             const random = crypto.randomUUID();
             const code = random.substring(0, 8);
             let file = '../Templates/codeMailer.hbs'
@@ -121,12 +121,15 @@ const resolver = {
                 user: newUser._id,
                 code: hashCode
             });
+
+          
+
+            const verify = await newVerify.save();
             await CodeMailer(file,  locals);
-
-            await newVerify.save();
-
+            // console.log(verify);
             return{
-                status: true,
+                account: account ? true : false,
+                verification: verify ? true : false,
                 message: `User account ${newUser.firstname} created. Check your email to verify your account.`
             }
         }catch(error){
@@ -134,6 +137,7 @@ const resolver = {
         }
     },
     Login: async (args, req) =>{ 
+        try{
         const email = args.email
         const password = args.password
         validateEmail(email)
@@ -143,7 +147,8 @@ const resolver = {
         const authanticate = await bcrypt.compareSync(password, authuser.password)
         authuser.password = null
         // Mailer(authuser)
-        if(!authanticate) throw new  GraphQLError("Email or Password is inccorect!")
+        if(!authanticate) throw new  GraphQLError(JSON.stringify({name:'authan', message:'Email or Password is inccorect!'}))
+        
 
         const role = getObjKey(AllowRoles, authuser.role)
         const payload = {
@@ -171,9 +176,12 @@ const resolver = {
                 email: authuser.email,
             }
         }
+    }catch(error){
+        return new GraphQLError(error)
+    }
     },
 
-    createProperty: async (args, req) =>{
+    createProperty: async (args, req) =>{ 
         try{
             const auth = req.auth
             const verify = await VerifyAuthorization(auth)
@@ -367,7 +375,6 @@ const resolver = {
             throw Error(error)
         }    
     },
-
     // Air BnB
     getAirBnb: async (args, req) =>{
       
@@ -517,28 +524,54 @@ const resolver = {
             airbnb: airbnb,
         }
     },
-    role: GraphQRole,
     sendVerification: async (args, req) =>{
         try{
+            
             const email =  args.email
+   
             const user = await User.findOne({email: email},{_id: 1, email:1, firstname:1, lastname:1})
-            const verify = await Verify.findOne({user: user._id},{code:1})
-
+            let verify = await Verify.findOne({user: user._id},{code:1})
+            
             const random = crypto.randomUUID();
             const code = random.substring(0, 8);
+            const hashCode = await bcrypt.hash(code, 12);
             let locals={
                 email: user.email,
                 firstname: user.firstname,
                 lastname: user.lastname,
                 code: code
             }
-            const hashCode = await bcrypt.hash(code, 12);
+
+            if(verify){
+                verify.code = hashCode;
+            }else{
+
+                const role = getObjKey(AllowRoles, user.role)
+                const payload = {
+                    _id: user._id,
+                    email: user.email,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    created: user.created,
+                    authorization: role
+                }
+               
+                //token expire in one year
+                const token = jwt.sign(
+                    payload,
+                    process.env.SECRECT,
+                    {expiresIn: '365d'},
+                )
+                verify =  new Verify({
+                    user: user._id,
+                    code: hashCode
+                });
+            }
             let file = '../Templates/codeMailer.hbs'
             await CodeMailer(file, locals)
-            verify.code = hashCode;
-            await verify.save();
+            const saved = await verify.save();
             return{
-                status: true,
+                status: saved ? true : false,
                 message: "Code sent to your email"
             }
         }catch(error){
@@ -546,54 +579,67 @@ const resolver = {
         }
     },
     resetPassword: async (args, req) =>{
-        const auth = "62c57500e35f35e5cd731440" //req.auth 
-        const oldPassword =  args.oldPassword;
-        const newPassword = args.newPassword;
-        validatePassword(newPassword)
-        
-        const getUser =  await User.findById(auth,{password: 1});
-        
-        const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
-        if(!authanticate) throw new  GraphQLError("Password is inccorect!")
+        try{
+            const auth = req?.auth
+            const email = args?.email
+            const oldPassword =  args.oldPassword;
+            const newPassword = args.newPassword;
+            validatePassword(newPassword);
 
-        const password = await bcrypt.hash(newPassword, 12);
-      
-        getUser.password = password
-        await getUser.save()
-        .then(res =>{
+            const getUser =  await User.findOne({email: email},{password: 1});
+            const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
+            if(!authanticate) throw new  GraphQLError("Password is inccorect!")
+          
+           
+            const password = await bcrypt.hash(newPassword, 12);
+            getUser.password = password
+            await getUser.save()
 
             return{
                 status:true,
                 message:'Password successfuly reset'
             }
-        }).catch(error =>{
-            throw Error(error)
-        })
-        
-
-        
+        }catch(error){
+            throw Error(error, {status: false})
+        }
     },
     VerifyAccount: async (args, req) =>{ 
         try{
             const email = args.user;
             const code = args.code
-            const user =  await User.findOne({email: email},{_id: 1, verified: 1})
+            const user =  await User.findOne({email: email},{_id: 1, verified: 1, role: 1, email: 1})
             const verify = await Verify.findOne({user: user._id},{code:1})
             const authanticate = await bcrypt.compareSync(code, verify.code)
-            if(authanticate){
-                user.verified = true;
-                await user.save();
-                await Verify.deleteOne({_id: verify._id})
-            }
+
+            if(!authanticate) throw new  GraphQLError(JSON.stringify({name:'verify', message:'Code is incorect!'}))
+  
+            user.verified = true;
+            await user.save();
+            await Verify.deleteOne({_id: verify._id})
+
+            // const role = getObjKey(AllowRoles, user.role)
+            // const payload = {
+            //     _id: user._id,
+            //     email: user.email,
+            //     authorization: role
+            // }
+
+            //token expire in 10 munite
+            // const session = jwt.sign(
+            //     payload,
+            //     process.env.SECRECT,
+            //     {expiresIn: '10m'},
+            // )
+
             return{
                 status: true,
-                message: "Account verified"
+                message: "Account verified",
+                // session:  session
             }
         }catch(error){
             throw Error(error, {status: false})
         }
     }
-
 }
 //,{$unwind: "$reservation"}
 module.exports = resolver

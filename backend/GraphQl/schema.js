@@ -170,6 +170,17 @@ module.exports = buildSchema(`
         message: String
     }
 
+    type VerifyStatus{
+        session: String
+        status: Boolean
+        message: String
+    }
+    type SignUpStatus{
+        account: Boolean
+        verification: Boolean
+        message: String
+    }
+
     type listing{
         properties: [Property]
     }
@@ -191,14 +202,14 @@ module.exports = buildSchema(`
 
     type RootMutation {
         createRole(name: String!): Status
-        SignUp(input: createUser): Status
+        SignUp(input: createUser): SignUpStatus
         Login(email: String!, password: String!): AuthPayload
         createProperty(input: createProperty):Status
         createAirBnb(input: airbnbInput):Status
         checkoutHome(place: ID, from: String): Status
         sendVerification(email: String!): Status
-        resetPassword(oldPassword: String, newPassword: String!): Status
-        VerifyAccount(user: String!, code: String!): Status
+        resetPassword(oldPassword: String, newPassword: String!, email: String): Status
+        VerifyAccount(user: String!, code: String!): VerifyStatus
     }
 
     schema{
