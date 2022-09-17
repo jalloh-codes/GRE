@@ -1,3 +1,13 @@
+.head_top_contains{
+    width: 100%;
+    height: auto;
+    margin: 7px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(66, 66, 199);
+}
 .Login_form_container{
     width: 500px;
     display: flex;
@@ -5,4 +15,21 @@
     margin: auto;
     min-height:600px; 
     padding-top: 140px;
+}
+
+.center-text{
+    text-align: center;
+    margin: 15px 0;
+}
+
+.center-link{
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.center-link:hover{
+    text-decoration:underline;
+    color: #e30c0c;
+    font-size: 17px;
 }

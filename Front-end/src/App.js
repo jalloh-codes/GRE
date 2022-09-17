@@ -18,7 +18,8 @@ import {Verification} from './Components/Verification/Verification'
 import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
 import {onError} from '@apollo/client/link/error';
-import {ResetPassword} from './Components/ResetPassword/ResetPassword'
+import {ResetPassword} from './Components/ResetPassword/ResetPassword';
+
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
       //graphQLErrors.map(({ message, locations, path }) => [{ Message: message, Location: locations, Path: path}]

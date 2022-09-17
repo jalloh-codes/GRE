@@ -4,9 +4,38 @@ import { gql} from "@apollo/client";
 export const SIGN_UP = gql`
 mutation SignUp($email: String!, $password: String!, $firstname: String!, $lastname: String!, $phoneNumber: String!, $UserType: String!){
   SignUp(input:{email: $email, password: $password, firstname: $firstname, lastname: $lastname, phoneNumber: $phoneNumber, UserType: $UserType}){
+    account
+    verification
+    message
+  }
+}
+`
+
+export const RESET_PASSWORD = gql`
+mutation resetPassword($oldPassword: String!, $newPassword: String!, $email: String){
+  resetPassword(oldPassword: $oldPassword, newPassword: $newPassword, email: $email){
     status
     message
   }
+}
+`
+
+export const VERIFY_ACCOUNT = gql`
+mutation VerifyAccount($user: String!, $code:String!){
+  VerifyAccount(user: $user, code: $code){
+    status
+    message
+    session
+  }
+}
+`
+
+export const SEND_VERIFICATION = gql`
+mutation  sendVerification($email: String!){
+  sendVerification(email: $email){
+      status
+      message
+    }
 }
 `
 
