@@ -1,6 +1,7 @@
 const {buildSchema} = require('graphql')
 // const {} = require('./scalarTypes')
 
+
 module.exports = buildSchema(`
     scalar role 
 
@@ -43,11 +44,16 @@ module.exports = buildSchema(`
         wifi: Boolean
         furnished: Boolean
     }
+    type File {
+        filename: String!
+        mimetype: String!
+        encoding: String!
+    }
     
     type Property{
         _id: ID
         lister: Lister
-        images: [String]
+        images: propertyImageType
         videos: [String]
         loc: Location
         propertyType: String
@@ -55,6 +61,11 @@ module.exports = buildSchema(`
         descriptions: String
         active: Boolean
         quantity: Int
+    }
+
+    type propertyImageType{
+        profile: String!
+        imagesArray: [String]
     }
 
     type AirBnB{
@@ -93,7 +104,7 @@ module.exports = buildSchema(`
     }
 
     input createProperty{
-        images: [String]!
+        images: propertyImageType
         videos: [String]
         studio: Boolean
         quantity: Int!
@@ -192,6 +203,7 @@ module.exports = buildSchema(`
         token: String!
         user: Lister
     }
+    
 
 
     
@@ -210,6 +222,7 @@ module.exports = buildSchema(`
         sendVerification(email: String!): Status
         resetPassword(oldPassword: String, newPassword: String!, email: String): Status
         VerifyAccount(user: String!, code: String!): VerifyStatus
+        imageUpload(file: String): Status
     }
 
     schema{
@@ -218,3 +231,5 @@ module.exports = buildSchema(`
     }
 
 `)
+
+// module.exports 

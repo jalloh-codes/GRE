@@ -4,16 +4,13 @@ const bcrypt = require('bcrypt');
 const Property = require('../Models/Property')
 const AllowRoles = require('../Config/AllowRoles')
 const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
-const mongoose = require('mongoose');
-const { populate } = require('../Models/Roles');
 const AirBnB = require('../Models/AirBnB');
 const Verify = require('../Models/Verify')
 const { GraphQLError } = require('graphql');
 // const Mailer = require('../Mailer/CodeMailer');
 const CodeMailer =  require('../Mailer/CodeMailer')
-// const {} = require
-const GraphQRole = require('./scalarTypes');
-const crypto =  require('crypto')
+const crypto =  require('crypto');
+const {propertyImageUpload}  = require('../Config/aws')
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -31,7 +28,6 @@ const validatePassword = (password) =>{
         if(!strongPassword.test(password) || !mediumPassword.test(password)) throw new Error("Password is not valid. Valid format,[Aa-zZ, 0-9, !@#$%^&*]")
     }
 }
-
 
 // get key by a value
 const getObjKey = (obj, value) => {
@@ -53,6 +49,7 @@ const user = async (id) =>{
     const user = await User.findOne({_id: id},{password: 0});
     return user
 }
+
 const AuthPayloadUser = async (email) =>{
     const user = await User.findOne({email: email})
     if (!user) throw new GraphQLError(JSON.stringify({name:'account', message:'Account does not exists!'}))
@@ -70,6 +67,7 @@ const building =  async (bdID) =>{
     }
 
 }
+
 const allBuildings = async () =>{
     const buildings  = await Building.find()
     return buildings.map(build =>{
@@ -81,7 +79,7 @@ const allBuildings = async () =>{
 }
 
 const resolver = {
-
+  
     SignUp: async (args, req) =>{
         try{
 
@@ -136,6 +134,7 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
+
     Login: async (args, req) =>{ 
         try{
         const email = args.email
@@ -186,7 +185,14 @@ const resolver = {
             const auth = req.auth
             const verify = await VerifyAuthorization(auth)
             if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task")
-        
+            
+            const profileFile  = args.input.images
+            const profileImage =  await propertyImageUpload('file', 'fileName');
+
+            let imageArray = [await propertyImageUpload('file', 'fileName')]
+
+            console.log(args.input.images);
+
             const Newstudio =  new Property({
                 lister: auth._id,
                 images: args.input.images,
@@ -211,7 +217,7 @@ const resolver = {
                 descriptions: args.input.descriptions,
                 quantity: args.input.quantity
             })
-            await Newstudio.save()
+            // await Newstudio.save()
    
             return{
                 status: true
@@ -219,7 +225,8 @@ const resolver = {
 
         }catch(error){
             throw Error(error)
-        }    },
+        }    
+    },
 
     // Non Air BnB type 
     getProperty: async (args, req) =>{
@@ -375,6 +382,7 @@ const resolver = {
             throw Error(error)
         }    
     },
+
     // Air BnB
     getAirBnb: async (args, req) =>{
       
@@ -524,6 +532,7 @@ const resolver = {
             airbnb: airbnb,
         }
     },
+
     sendVerification: async (args, req) =>{
         try{
             
@@ -578,6 +587,7 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
+
     resetPassword: async (args, req) =>{
         try{
             const auth = req?.auth
@@ -603,6 +613,7 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
+
     VerifyAccount: async (args, req) =>{ 
         try{
             const email = args.user;
@@ -638,6 +649,15 @@ const resolver = {
             }
         }catch(error){
             throw Error(error, {status: false})
+        }
+    },
+    imageUpload: async (args, req) =>{
+        const file =  args
+
+        console.log(file);
+        return{
+            status: true,
+            message: 'String'
         }
     }
 }

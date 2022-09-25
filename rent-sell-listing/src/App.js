@@ -58,7 +58,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
 const client = new ApolloClient({
   link: concat(authMiddleware, link),
-  cache: new InMemoryCache()
+  cache:new InMemoryCache().restore(window.__APOLLO_STATE__)
 });
 
 function App() {
@@ -80,7 +80,6 @@ function App() {
     }
   },[authanticated])
 
-  console.log(localStorage.getItem('email') ? 'a' : 'b') ;
 
 
   return(
@@ -100,7 +99,7 @@ function App() {
           <Route exact path="/" element={<LoginComponent />} />
           <Route path="/signup" element={<SignUpComponent />} />
           <Route path="/resetpassword" element={<ResetPassword />} />
-          <Route  path="verify" element={<Verification />} />
+          <Route  path="/verify" element={<Verification />} />
           </>
           }
       </Routes>

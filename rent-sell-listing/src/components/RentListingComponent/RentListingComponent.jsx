@@ -12,6 +12,7 @@ import ErrorMSg from '../ApiHandling/ErrorMsg';
 import { useNavigate} from 'react-router-dom';
 import SuccessMsg from '../ApiHandling/SuccessMsg'
 import {authContext} from '../../Context/authContext';
+import {convertToBase64} from '../../Functions/AuthFunction'
 export const RentListingComponent = ({authStatus, logout}) => {
 
     const navigate = useNavigate()
@@ -33,16 +34,19 @@ export const RentListingComponent = ({authStatus, logout}) => {
     const[bath, setBath] = useState(1)
     const[region, setRegion] = useState('')
     const[commune, setCommune] = useState('')
-    const[images, setImages] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyamin-mellish-106399.jpg&fm=jpg'])
+    const[profile, setProfile] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyamin-mellish-106399.jpg&fm=jpg'])
+    const [imagesArray, setImagesArray] = useState([''])
     const[descriptions, setDescriptions] = useState('')
     const[studio, setStudio] = useState(false)
     const [onError, setOnError]  = useState('')
     const [onSuccess, setOnSuccess] = useState('')
-
+    const [file, setFile] = useState()
     // const data  = localStorage.getItem('user')
     // console.log(JSON.parse(data)._id);
-    const submit = (e) =>{
+
+    const submit = async (e) =>{
         e.preventDefault();
+        let imageProfile = await convertToBase64(profile)
         createProperty({
             variables:{
                 studio: Boolean(studio),
@@ -62,30 +66,31 @@ export const RentListingComponent = ({authStatus, logout}) => {
                 lat: parseFloat(lat),
                 region: region,
                 commune: commune,
-                images: images,
+                images: {
+                    profile: imageProfile,
+                    imagesArray: imagesArray
+                },
                 descriptions: descriptions,
             }
         }).then(res =>{
             const data  = res.data.createProperty
             setOnSuccess(data['message'])
         }).catch(err =>{
+            console.log(err);
             setOnError(err["message"])
         })
     }
 
-    
 
     useEffect(() =>{
-        if(authanticated){
-          return navigate('/makeChoice')
-        }else{
+        if(!authanticated){
           return navigate("/")
         }
       },[authanticated, navigate])
 
-    if(loading){
-        return
-    }
+    // if(loading){
+    //     return
+    // }
 
     // lng, lat 9.587067532734139, -13.617767469830135
     return (
@@ -149,7 +154,7 @@ export const RentListingComponent = ({authStatus, logout}) => {
                     </div>
                     <div className="property_pictures">
                         <p>Upload property pictures</p>
-                        <input type="file"  onChange={(e) => setImages(e.target.files[0])} />
+                        <input type="file"  onChange={(e) => setProfile(e.target.files[0])} />
                     </div>
                     
                 </div>

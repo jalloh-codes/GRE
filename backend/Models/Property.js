@@ -25,9 +25,13 @@ const PropertySchema =  new schema({
             required: [true, 'Empty field']
         }
     },
-    images:[
-        {type:String}
-    ],
+    images:{
+        profile:{
+            type: String,
+            required: true,
+        },
+        imagesArray:[{type: String}]
+    },
     propertyType:{
         type: String,
         required: [true, 'Empty field'],

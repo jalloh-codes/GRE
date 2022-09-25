@@ -3,11 +3,11 @@ const graphqlHTTP = require('express-graphql').graphqlHTTP
 const mongoose = require('mongoose')
 const cors = require('cors')
 const http =  require('http');
-// const { graphqlHTTP } = require('express-graphql');
-
 const schema = require('./GraphQl/schema')
 const resolver = require('./GraphQl/resolver')
 const authMiddleware = require('./middleware/auth')
+const { graphqlUploadExpress } = require("graphql-upload-minimal");
+
 require('dotenv').config()
 const port = process.env.PORT || 8080;
 const app = express();
@@ -24,11 +24,14 @@ const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0
 
 
 app.use(authMiddleware);
-app.use('/gre', graphqlHTTP({
-  schema: schema,
-  rootValue: resolver,
-  graphiql: true,
-}))
+// app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }))
+app.use('/gre',   graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+  graphqlHTTP({
+    schema: schema,
+    rootValue: resolver,
+    graphiql: true,
+  })
+)
 
 // database connection
 mongoose.connect(db, {useUnifiedTopology: true, useNewUrlParser: true})
