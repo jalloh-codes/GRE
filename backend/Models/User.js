@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-const Roles = require('./Roles')
+import  mongoose from 'mongoose';
+// import Roles from './Roles'
 const schema = mongoose.Schema;
-const AllowRoles = require('../Config/AllowRoles')
-const VerifyRole = async (role) =>{
-    console.log(role);
-    const roles  =  await Roles.findById({_id: role})
+import {AllowRoles} from '../Config/AllowRoles.js'
+// const VerifyRole = async (role) =>{
+//     console.log(role);
+//     const roles  =  await Roles.findById({_id: role})
 
-    return roles ? true: false
-}
+//     return roles ? true: false
+// }
 
 
 const UserSchema =  new schema({
@@ -76,4 +76,4 @@ const UserSchema =  new schema({
     }
 })
 
-module.exports = User = mongoose.model('User', UserSchema);
+export const  User = mongoose.model('User', UserSchema);

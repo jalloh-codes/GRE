@@ -3,8 +3,8 @@ import { gql} from "@apollo/client";
 //, email: $email, password:$password, UserType: $UserType, phoneNumber: $phoneNumber
 
 export const UPLOAD_IMAGE = gql`
-mutation imageUpload($file: Upload){
-  imageUpload(file: $file){
+mutation UploadImage($file: Upload){
+  UploadImage(file: $file){
     status
     message
   }
@@ -68,13 +68,15 @@ mutation Login($email: String!, $password: String!){
 
 export const Add_Sell_Property = gql`
 mutation createProperty($studio: Boolean, $descriptions: String, $airCondition: Boolean, 
-  $furnished: Boolean, $wifi: Boolean, $images: propertyImageType, $bed: Int!, $bath: Int!, 
+  $furnished: Boolean, $wifi: Boolean, $profile: Upload!, $imagesArray: [Upload],
+   $bed: Int!, $bath: Int!, 
   $region: String!, $lat: Float!, $lng: Float!, $price: Float!, $width: Int,
    $length: Int, $commune: String!, $propertyType: String!, $quantity: Int!, $parking: Boolean!){
   
-  createProperty(input: {studio: $studio, descriptions: $descriptions, airCondition: $airCondition, furnished: $furnished, wifi: $wifi, images: $images, bed: $bed, bath: $bath, price: $price, region: $region, lat: $lat, lng: $lng, width: $width, length:$length, commune:$commune, propertyType: $propertyType, quantity: $quantity, parking: $parking}){
+  createProperty(input: {studio: $studio, profile: $profile, imagesArray: $imagesArray, descriptions: $descriptions, airCondition: $airCondition, furnished: $furnished, wifi: $wifi, bed: $bed, bath: $bath, price: $price, region: $region, lat: $lat, lng: $lng, width: $width, length:$length, commune:$commune, propertyType: $propertyType, quantity: $quantity, parking: $parking}){
     status
     message
   }
 }
 `
+

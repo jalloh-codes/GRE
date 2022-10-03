@@ -1,14 +1,17 @@
-const express = require('express');
-const graphqlHTTP = require('express-graphql').graphqlHTTP
-const mongoose = require('mongoose')
-const cors = require('cors')
-const http =  require('http');
-const schema = require('./GraphQl/schema')
-const resolver = require('./GraphQl/resolver')
-const authMiddleware = require('./middleware/auth')
-const { graphqlUploadExpress } = require("graphql-upload-minimal");
+import express from 'express';
+import {graphqlHTTP}  from 'express-graphql'
+import mongoose from 'mongoose'
+import cors from 'cors'
+import http from 'http'
+import {typeDefs} from './GraphQl/typeDefs.js'
+import {resolvers} from './GraphQl/resolvers.js'
+import {authMiddleware} from'./middleware/auth.js'
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
 
-require('dotenv').config()
+//   graphqlUploadExpress, // A Koa implementation is also exported.
+// } = require('graphql-upload');
+import * as dotenv from 'dotenv'
+dotenv.config()
 const port = process.env.PORT || 8080;
 const app = express();
 const corsOptions = {
@@ -22,13 +25,14 @@ const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
 
-
+//graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 })
 app.use(authMiddleware);
-// app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }))
-app.use('/gre',   graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+app.use(graphqlUploadExpress({ maxFileSize: 30000000, maxFiles: 10 }))
+// app.use(graphqlUploadExpress());
+app.use('/gre', 
   graphqlHTTP({
-    schema: schema,
-    rootValue: resolver,
+    schema: typeDefs,
+    rootValue: resolvers,
     graphiql: true,
   })
 )

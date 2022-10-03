@@ -17,6 +17,7 @@ import {useToken} from './components/Api/useToken';
 import {Verification} from './components/Verification/Verification'
 import {authContext} from  './Context/authContext';
 import {ResetPassword} from './components/ResetPassword/ResetPassword'
+import { createUploadLink } from 'apollo-upload-client'
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
@@ -30,10 +31,19 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 
-const link = from([
-  errorLink,
-   new HttpLink({uri: "http://localhost:8080/gre"}), 
-])
+// const link = from([
+//   errorLink,
+//    new HttpLink({uri: "http://localhost:8080/gre"}), 
+// ])
+
+const uploadLink = createUploadLink({
+  uri: 'http://localhost:8080/gre',
+  errorLink
+});
+// const link = createUploadLink([
+//   errorLink,
+//    new HttpLink({uri: "http://localhost:8080/gre"}), 
+// ])
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   // add the authorization to the headers
@@ -56,9 +66,17 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 })
 
+// const client = new ApolloClient({
+//   link: concat(authMiddleware, link),
+//   cache:new InMemoryCache().restore(window.__APOLLO_STATE__)
+// });
+
+
+
+
 const client = new ApolloClient({
-  link: concat(authMiddleware, link),
-  cache:new InMemoryCache().restore(window.__APOLLO_STATE__)
+  link: concat(authMiddleware, uploadLink),
+  cache: new InMemoryCache(),
 });
 
 function App() {

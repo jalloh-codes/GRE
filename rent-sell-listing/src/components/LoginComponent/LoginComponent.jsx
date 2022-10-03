@@ -43,6 +43,7 @@ export const LoginComponent = () => {
                 setAuthanticated(true)
             }
         }).catch((err) =>{
+            console.log(err);
             const jsonError =  JSON.parse(err.message)
             setOnError(jsonError)
         })

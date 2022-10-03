@@ -41,6 +41,7 @@ export const ResetPassword = () => {
                 console.log(res);
                 navigate('/')
             }).catch(error => {
+                console.log(error);
                 // TODO
                 // Error handleling
             

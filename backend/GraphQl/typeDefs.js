@@ -1,10 +1,11 @@
-const {buildSchema} = require('graphql')
+import {buildSchema}  from 'graphql'
+import { gql } from 'apollo-server-express';
 // const {} = require('./scalarTypes')
 
 
-module.exports = buildSchema(`
+export const typeDefs = buildSchema(`
     scalar role 
-
+    scalar Upload
     type Role{
         _id: ID!
         name: String
@@ -104,7 +105,8 @@ module.exports = buildSchema(`
     }
 
     input createProperty{
-        images: propertyImageType
+        profile: Upload!
+        imagesArray: [Upload]
         videos: [String]
         studio: Boolean
         quantity: Int!
@@ -222,7 +224,7 @@ module.exports = buildSchema(`
         sendVerification(email: String!): Status
         resetPassword(oldPassword: String, newPassword: String!, email: String): Status
         VerifyAccount(user: String!, code: String!): VerifyStatus
-        imageUpload(file: String): Status
+        UploadImage(file: Upload): Status
     }
 
     schema{
@@ -230,6 +232,4 @@ module.exports = buildSchema(`
         mutation: RootMutation
     }
 
-`)
-
-// module.exports 
+`);

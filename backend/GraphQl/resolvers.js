@@ -1,16 +1,17 @@
-const User = require('../Models/User');
-const jwt  = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const Property = require('../Models/Property')
-const AllowRoles = require('../Config/AllowRoles')
-const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
-const AirBnB = require('../Models/AirBnB');
-const Verify = require('../Models/Verify')
-const { GraphQLError } = require('graphql');
+import {User} from '../Models/User.js';
+import jwt  from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import {Property} from '../Models/Property.js'
+import {AllowRoles} from '../Config/AllowRoles.js'
+import {BuyOrRent, Listing, functionality} from '../Config/functionality.js'
+import {AirBnB}  from '../Models/AirBnB.js';
+import {Verify} from '../Models/Verify.js'
+import { GraphQLError } from 'graphql';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 // const Mailer = require('../Mailer/CodeMailer');
-const CodeMailer =  require('../Mailer/CodeMailer')
-const crypto =  require('crypto');
-const {propertyImageUpload}  = require('../Config/aws')
+import {CodeMailer} from '../Mailer/CodeMailer.js'
+import crypto, { randomBytes } from 'crypto';
+import {propertyImageUpload}  from '../Config/aws.js'
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -78,8 +79,8 @@ const allBuildings = async () =>{
     })
 }
 
-const resolver = {
-  
+export const resolvers  = {
+    Upload: GraphQLUpload,
     SignUp: async (args, req) =>{
         try{
 
@@ -180,42 +181,63 @@ const resolver = {
     }
     },
 
-    createProperty: async (args, req) =>{ 
+    createProperty: async ({input}, req) =>{ 
         try{
             const auth = req.auth
             const verify = await VerifyAuthorization(auth)
-            if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task")
+
+            if(!(verify !== "Admin" || verify !== "Listing")) throw new GraphQLError("Not Authorize to perform this task")
+
+            let {imagesArray,studio,quantity,
+            length,width,bed,bath,propertyType,
+            price,descriptions,region,commune,
+            lat,lng,parking,airCondition,
+            furnished,wifi} = await input
+
+            const file = await input.profile.file
+            const {filename} =  await file
+
+            const bytes = await randomBytes(16).toString('hex')
+            const pofile_filename = bytes + '-' + auth._id + '-'+ Date.now() + filename
+        
+
+            console.log(pofile_filename);
             
-            const profileFile  = args.input.images
-            const profileImage =  await propertyImageUpload('file', 'fileName');
+        
+            const profileImage =  await propertyImageUpload(file, pofile_filename);
 
-            let imageArray = [await propertyImageUpload('file', 'fileName')]
+            console.log(profileImage);
 
-            console.log(args.input.images);
-
+            let propertyImageType = {
+                profile: file,
+                imagesArray: imagesArray
+            }
             const Newstudio =  new Property({
                 lister: auth._id,
-                images: args.input.images,
-                videos: args.input.videos,
-                propertyType:  args.input.propertyType,
+                images: propertyImageType,
+                // videos: videos,
+                propertyType:  propertyType,
                 details:{
-                    studio: args.input.studio,
-                    length: args.input.length,
-                    width: args.input.width,
-                    bed: args.input.bed,
-                    bath: args.input.bath,
-                    parking: args.input.parking,
-                    built: args.input.built,
-                    price:args.input.price,
+                    studio: studio,
+                    length: length,
+                    width: width,
+                    bed: bed,
+                    bath: bath,
+                    parking: parking,
+                    // built: built,
+                    price: price,
+                    airCondition: airCondition,
+                    furnished: furnished,
+                    wifi: wifi
                 },
                 loc:{
-                    region: args.input.region,
-                    commune: args.input.commune,
-                    lat: args.input.lat,
-                    lng: args.input.lng
+                    region: region,
+                    commune: commune,
+                    lat:lat,
+                    lng: lng
                 },
-                descriptions: args.input.descriptions,
-                quantity: args.input.quantity
+                descriptions: descriptions,
+                quantity: quantity
             })
             // await Newstudio.save()
    
@@ -224,6 +246,7 @@ const resolver = {
             }
 
         }catch(error){
+            console.log(error);
             throw Error(error)
         }    
     },
@@ -590,7 +613,7 @@ const resolver = {
 
     resetPassword: async (args, req) =>{
         try{
-            const auth = req?.auth
+            // const auth = req?.auth
             const email = args?.email
             const oldPassword =  args.oldPassword;
             const newPassword = args.newPassword;
@@ -598,13 +621,13 @@ const resolver = {
 
             const getUser =  await User.findOne({email: email},{password: 1});
             const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
-            if(!authanticate) throw new  GraphQLError("Password is inccorect!")
+            // if(!authanticate) throw new  GraphQLError("Password is inccorect!")
           
            
             const password = await bcrypt.hash(newPassword, 12);
             getUser.password = password
             await getUser.save()
-
+            console.log(getUser);
             return{
                 status:true,
                 message:'Password successfuly reset'
@@ -651,15 +674,17 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
-    imageUpload: async (args, req) =>{
-        const file =  args
 
-        console.log(file);
+    UploadImage: async (args, req) =>{
+
+        const file = await  args.file.file
+        const { filename } = await file;
+        const profileImage =  await propertyImageUpload(file, filename);
+        console.log(profileImage);
         return{
             status: true,
             message: 'String'
         }
     }
 }
-//,{$unwind: "$reservation"}
-module.exports = resolver
+

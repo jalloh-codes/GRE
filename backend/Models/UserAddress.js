@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
 const AddressSchema =  new schema({
@@ -22,4 +22,4 @@ const AddressSchema =  new schema({
     },
 })
 
-module.exports = UserAddress = mongoose.model('UserAddress', AddressSchema);
+export const UserAddress = mongoose.model('UserAddress', AddressSchema);

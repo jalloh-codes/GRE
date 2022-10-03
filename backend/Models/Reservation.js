@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema =  mongoose.Schema;
 
-const Reservation = new Schema({
+const ReservationSchema = new Schema({
     lister:{
         type: schema.Types.ObjectId,
         ref: "User",
@@ -30,4 +30,4 @@ const Reservation = new Schema({
     }
 })
 
-module.exports = Reservation = mongoose.model('Reservation', Reservation)
+export const Reservation = mongoose.model('Reservation', ReservationSchema)
