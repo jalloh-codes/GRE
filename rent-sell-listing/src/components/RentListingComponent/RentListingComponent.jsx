@@ -160,7 +160,7 @@ export const RentListingComponent = ({authStatus, logout}) => {
                                 onChange={(e) => setBed(e.target.value)} min={1} className="length" />
                             </div>
                             <div>
-                                <label>Length</label>
+                                <label>Bath</label>
                                 <input type="number" value={bath} 
                                 onChange={(e) => setBath(e.target.value)} min={1} className="length" />
                             </div>

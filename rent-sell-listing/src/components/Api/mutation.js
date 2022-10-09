@@ -69,11 +69,11 @@ mutation Login($email: String!, $password: String!){
 export const Add_Sell_Property = gql`
 mutation createProperty($studio: Boolean, $descriptions: String, $airCondition: Boolean, 
   $furnished: Boolean, $wifi: Boolean, $profile: Upload!, $imagesArray: [Upload],
-   $bed: Int!, $bath: Int!, 
+   $bed: Int!, $bath: Int!,$built: Int
   $region: String!, $lat: Float!, $lng: Float!, $price: Float!, $width: Int,
    $length: Int, $commune: String!, $propertyType: String!, $quantity: Int!, $parking: Boolean!){
   
-  createProperty(input: {studio: $studio, profile: $profile, imagesArray: $imagesArray, descriptions: $descriptions, airCondition: $airCondition, furnished: $furnished, wifi: $wifi, bed: $bed, bath: $bath, price: $price, region: $region, lat: $lat, lng: $lng, width: $width, length:$length, commune:$commune, propertyType: $propertyType, quantity: $quantity, parking: $parking}){
+  createProperty(input: {studio: $studio, built: $built, profile: $profile, imagesArray: $imagesArray, descriptions: $descriptions, airCondition: $airCondition, furnished: $furnished, wifi: $wifi, bed: $bed, bath: $bath, price: $price, region: $region, lat: $lat, lng: $lng, width: $width, length:$length, commune:$commune, propertyType: $propertyType, quantity: $quantity, parking: $parking}){
     status
     message
   }

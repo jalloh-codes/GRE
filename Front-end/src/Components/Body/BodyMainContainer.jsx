@@ -9,30 +9,31 @@ import onomo from './onomo.webp';
 import riviera from './riviera.jpeg';
 import{useQuery} from '@apollo/client';
 import {GTE_PROPERTIES}  from '../Api/query';
-import { SingleHome } from '../SingleHome/SingleHome'
+import {PropertyCard} from './PropertyCard'
+// import { SingleHome } from '../SingleHome/SingleHome'
 
 
-const PropertyCard = ({propertie}) =>{
-    const name  = propertie.name ? propertie.name : ''
-    const images = propertie.images ? propertie.images[0] : '.png';
-    const lat = propertie.loc.lat
-    const lng =  propertie.loc.lng
-    const address = propertie.loc.region +' ' +propertie.loc.commune
-    const price = propertie.details.price 
-    return(
-        <div className="image">
-            <div className="picture">    
-                <img src={images} alt="Logo" />
-            </div>
-            <SingleHome images={images} 
-                value={name} 
-                roomType={propertie.propertyType} 
-                address={address}
-                location={{ "lat": lat, "lng":  lng }} />
-            <div className="title">{price}$/night</div>
-    </div>
-    )
-}
+// const PropertyCard = ({propertie}) =>{
+//     const name  = propertie.name ? propertie.name : ''
+//     const images = propertie.images ? propertie.images[0] : '.png';
+//     const lat = propertie.loc.lat
+//     const lng =  propertie.loc.lng
+//     const address = propertie.loc.region +' ' +propertie.loc.commune
+//     const price = propertie.details.price 
+//     return(
+//         <div className="image">
+//             <div className="picture">    
+//                 <img src={images} alt="Logo" />
+//             </div>
+//             <SingleHome images={images} 
+//                 value={name} 
+//                 roomType={propertie.propertyType} 
+//                 address={address}
+//                 location={{ "lat": lat, "lng":  lng }} />
+//             <div className="title">{price}$/night</div>
+//     </div>
+//     )
+// }
 
 
 // class BodyMainContainer extends React.Component {
@@ -73,6 +74,7 @@ const BodyMainContainer = () =>{
         let pos = $('.image-container').scrollLeft() + far;
         $('.image-container').animate({ scrollLeft: pos }, 1000)
     }
+    
 
     // render() {
         const tab = [{ image: noom, name: "Noom hotel", price: "100" }, { image: riviera, name: "Riviera hotel", price: "107" }, { image: onomo, name: "Onomo hotel", price: "120" }, { image: sheraton, name: "Sheraton hotel", price: "102" }, { image: atlantic, name: "Atlantic hotel", price: "110" }, { image: maison_blanche, name: "Maison Blanche hotel", price: "140" }];

@@ -11,7 +11,7 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 // const Mailer = require('../Mailer/CodeMailer');
 import {CodeMailer} from '../Mailer/CodeMailer.js'
 import crypto, { randomBytes } from 'crypto';
-import {propertyImageUpload}  from '../Config/aws.js'
+import {propertyImageUpload, getFileReadStrem}  from '../Config/aws.js'
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -192,7 +192,7 @@ export const resolvers  = {
             length,width,bed,bath,propertyType,
             price,descriptions,region,commune,
             lat,lng,parking,airCondition,
-            furnished,wifi} = await input
+            furnished,wifi,built} = await input
 
             const file = await input.profile.file
             const {filename} =  await file
@@ -200,19 +200,13 @@ export const resolvers  = {
             const bytes = await randomBytes(16).toString('hex')
             const pofile_filename = bytes + '-' + auth._id + '-'+ Date.now() + filename
         
-
-            console.log(pofile_filename);
-            
-        
             const profileImage =  await propertyImageUpload(file, pofile_filename);
 
-            console.log(profileImage);
-
             let propertyImageType = {
-                profile: file,
-                imagesArray: imagesArray
+                profile: profileImage.Key,
+                imagesArray: imagesArray ? imagesArray : []
             }
-            const Newstudio =  new Property({
+            const newProperty =  new Property({
                 lister: auth._id,
                 images: propertyImageType,
                 // videos: videos,
@@ -224,7 +218,7 @@ export const resolvers  = {
                     bed: bed,
                     bath: bath,
                     parking: parking,
-                    // built: built,
+                    built: built,
                     price: price,
                     airCondition: airCondition,
                     furnished: furnished,
@@ -239,8 +233,7 @@ export const resolvers  = {
                 descriptions: descriptions,
                 quantity: quantity
             })
-            // await Newstudio.save()
-   
+            await newProperty.save()
             return{
                 status: true
             }
@@ -560,7 +553,7 @@ export const resolvers  = {
         try{
             
             const email =  args.email
-   
+            
             const user = await User.findOne({email: email},{_id: 1, email:1, firstname:1, lastname:1})
             let verify = await Verify.findOne({user: user._id},{code:1})
             
@@ -599,14 +592,16 @@ export const resolvers  = {
                     code: hashCode
                 });
             }
-            let file = '../Templates/codeMailer.hbs'
+            let file = '/codeMailer.hbs'
             await CodeMailer(file, locals)
             const saved = await verify.save();
+            
             return{
                 status: saved ? true : false,
                 message: "Code sent to your email"
             }
         }catch(error){
+            console.log(error);
             throw Error(error, {status: false})
         }
     },
@@ -618,7 +613,7 @@ export const resolvers  = {
             const oldPassword =  args.oldPassword;
             const newPassword = args.newPassword;
             validatePassword(newPassword);
-
+            console.log(1);
             const getUser =  await User.findOne({email: email},{password: 1});
             const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
             // if(!authanticate) throw new  GraphQLError("Password is inccorect!")
@@ -679,11 +674,31 @@ export const resolvers  = {
 
         const file = await  args.file.file
         const { filename } = await file;
-        const profileImage =  await propertyImageUpload(file, filename);
-        console.log(profileImage);
+
+        const bytes = await randomBytes(16).toString('hex')
+        const pofile_filename = bytes + '-'+ Date.now() + filename
+    
+        const profileImage =  await propertyImageUpload(file, pofile_filename);
+
+        const getImage = await getFileReadStrem(profileImage.Key)
+        console.log(profileImage.Location);
+        console.log(getImage);
         return{
             status: true,
             message: 'String'
+        }
+    },
+    getImage: async (args, req) =>{
+        try {
+            const fileKey = args.fileKey
+            // const bucket = args.from
+            //gre-image-property
+            const image = await getFileReadStrem(fileKey)
+            return{
+                image: image
+            }
+        } catch (error) {
+            throw Error(error)
         }
     }
 }

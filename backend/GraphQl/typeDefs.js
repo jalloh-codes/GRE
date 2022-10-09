@@ -45,11 +45,6 @@ export const typeDefs = buildSchema(`
         wifi: Boolean
         furnished: Boolean
     }
-    type File {
-        filename: String!
-        mimetype: String!
-        encoding: String!
-    }
     
     type Property{
         _id: ID
@@ -200,18 +195,19 @@ export const typeDefs = buildSchema(`
     type ListingAirBnb{
         airbnb: [AirBnB]
     }
+    type ImageUrl{
+        image: String!
+    }
 
     type AuthPayload {
         token: String!
         user: Lister
     }
     
-
-
-    
     type RootQuery {
         getProperty(input: search): listing
         getAirBnb(input: searchAirBnb): ListingAirBnb
+        getImage(fileKey: String!): ImageUrl
     }
 
     type RootMutation {

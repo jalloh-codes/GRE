@@ -5,9 +5,12 @@ import path from 'path'
 import hbs from 'handlebars'
 import { GraphQLError } from 'graphql'
 import smtpTransport from 'nodemailer-smtp-transport';
+const __dirname = path.resolve();
+
 export const CodeMailer = async (file, locals) =>{
+    console.log(path.join(__dirname, '/Templates'));
     // Open template file
-    const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
+    const source = fs.readFileSync(path.join(__dirname, '/Templates', file), 'utf8');
     // Create email generator
     const template = hbs.compile(source);
     // let testAccount = await nodemailer.createTestAccount();
