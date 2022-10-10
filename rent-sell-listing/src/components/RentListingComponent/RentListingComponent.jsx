@@ -12,7 +12,6 @@ import ErrorMSg from '../ApiHandling/ErrorMsg';
 import {useNavigate} from 'react-router-dom';
 import SuccessMsg from '../ApiHandling/SuccessMsg'
 import {authContext} from '../../Context/authContext';
-import {convertToBase64} from '../../Functions/AuthFunction'
 export const RentListingComponent = ({authStatus, logout}) => {
 
     const navigate = useNavigate()
@@ -90,11 +89,6 @@ export const RentListingComponent = ({authStatus, logout}) => {
 
     const  upload = async (e)  =>{
         e.preventDefault()
-        // let image = await convertToBase64(profile)
-        // console.log(profile);
-        // const form =  new FormData()
-        // form.append('file', profile)
-        console.log(profile);
         UploadImage({
             variables:{
                 file: profile
@@ -172,7 +166,6 @@ export const RentListingComponent = ({authStatus, logout}) => {
                     <div className="property_pictures">
                         <p>Upload property pictures</p>
                         <input type="file"  onChange={(e) => setProfile(e.target.files[0])} />
-                        <Button variant="primary" type="submit" onClick={upload}>Submit</Button>
                     </div>
                 
                 </div>
