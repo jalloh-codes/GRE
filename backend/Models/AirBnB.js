@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema;
 
 const schemaAirBnB = new Schema({
@@ -107,7 +107,7 @@ const schemaAirBnB = new Schema({
 })
 
 
-module.exports = AirBnB = mongoose.model('AirBnB', schemaAirBnB)
+export const AirBnB = mongoose.model('AirBnB', schemaAirBnB)
 
 
 

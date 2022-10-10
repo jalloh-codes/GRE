@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
 const PropertySchema =  new schema({
@@ -25,9 +25,13 @@ const PropertySchema =  new schema({
             required: [true, 'Empty field']
         }
     },
-    images:[
-        {type:String}
-    ],
+    images:{
+        profile:{
+            type: String,
+            required: true,
+        },
+        imagesArray:[{type: String}]
+    },
     propertyType:{
         type: String,
         required: [true, 'Empty field'],
@@ -99,4 +103,4 @@ const PropertySchema =  new schema({
     }
 })
 
-module.exports = House = mongoose.model('Property', PropertySchema);
+export const Property = mongoose.model('Property', PropertySchema);

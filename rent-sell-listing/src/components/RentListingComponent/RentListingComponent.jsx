@@ -5,18 +5,20 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import "./RentListingComponent.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Add_Sell_Property} from '../Api/mutation';
+import {Add_Sell_Property, UPLOAD_IMAGE} from '../Api/mutation';
 import { useMutation } from '@apollo/client';
 import Loading from "../ApiHandling/Loading";
 import ErrorMSg from '../ApiHandling/ErrorMsg';
-import { useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import SuccessMsg from '../ApiHandling/SuccessMsg'
 import {authContext} from '../../Context/authContext';
+import {convertToBase64} from '../../Functions/AuthFunction'
 export const RentListingComponent = ({authStatus, logout}) => {
 
     const navigate = useNavigate()
     const {authanticated} =  useContext(authContext);
     const[createProperty, {loading}] = useMutation(Add_Sell_Property)
+    const[UploadImage] = useMutation(UPLOAD_IMAGE)
     const[price, setPrice] = useState(0.0)
     const[propertyType, setPropertyType] = useState(String)
     const[quantity, setQuantity] = useState(1)
@@ -33,16 +35,19 @@ export const RentListingComponent = ({authStatus, logout}) => {
     const[bath, setBath] = useState(1)
     const[region, setRegion] = useState('')
     const[commune, setCommune] = useState('')
-    const[images, setImages] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyamin-mellish-106399.jpg&fm=jpg'])
+    const[profile, setProfile] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyamin-mellish-106399.jpg&fm=jpg'])
+    const [imagesArray, setImagesArray] = useState([''])
     const[descriptions, setDescriptions] = useState('')
     const[studio, setStudio] = useState(false)
     const [onError, setOnError]  = useState('')
     const [onSuccess, setOnSuccess] = useState('')
-
+    const [file, setFile] = useState()
     // const data  = localStorage.getItem('user')
     // console.log(JSON.parse(data)._id);
-    const submit = (e) =>{
+
+    const submit = async (e) =>{
         e.preventDefault();
+        console.log(profile);
         createProperty({
             variables:{
                 studio: Boolean(studio),
@@ -62,30 +67,47 @@ export const RentListingComponent = ({authStatus, logout}) => {
                 lat: parseFloat(lat),
                 region: region,
                 commune: commune,
-                images: images,
+                profile: profile,
+                imagesArray: imagesArray,
                 descriptions: descriptions,
             }
         }).then(res =>{
             const data  = res.data.createProperty
             setOnSuccess(data['message'])
         }).catch(err =>{
+            console.log(err);
             setOnError(err["message"])
         })
     }
 
-    
 
     useEffect(() =>{
-        if(authanticated){
-          return navigate('/makeChoice')
-        }else{
+        if(!authanticated){
           return navigate("/")
         }
       },[authanticated, navigate])
+    
 
-    if(loading){
-        return
+    const  upload = async (e)  =>{
+        e.preventDefault()
+        // let image = await convertToBase64(profile)
+        // console.log(profile);
+        // const form =  new FormData()
+        // form.append('file', profile)
+        console.log(profile);
+        UploadImage({
+            variables:{
+                file: profile
+            }
+        }).then(res =>{
+            console.log(res);
+        }).catch(error =>{
+            console.log(error);
+        })
     }
+    // if(loading){
+    //     return
+    // }
 
     // lng, lat 9.587067532734139, -13.617767469830135
     return (
@@ -138,7 +160,7 @@ export const RentListingComponent = ({authStatus, logout}) => {
                                 onChange={(e) => setBed(e.target.value)} min={1} className="length" />
                             </div>
                             <div>
-                                <label>Length</label>
+                                <label>Bath</label>
                                 <input type="number" value={bath} 
                                 onChange={(e) => setBath(e.target.value)} min={1} className="length" />
                             </div>
@@ -149,9 +171,10 @@ export const RentListingComponent = ({authStatus, logout}) => {
                     </div>
                     <div className="property_pictures">
                         <p>Upload property pictures</p>
-                        <input type="file"  onChange={(e) => setImages(e.target.files[0])} />
+                        <input type="file"  onChange={(e) => setProfile(e.target.files[0])} />
+                        <Button variant="primary" type="submit" onClick={upload}>Submit</Button>
                     </div>
-                    
+                
                 </div>
                 <div className="rest_of_the_info">
                     <div>
@@ -169,7 +192,6 @@ export const RentListingComponent = ({authStatus, logout}) => {
                         <input type="Number" placeholder="Latitude" className="prop_input" 
                         value={lat} onChange={(e) => setLat(e.target.value)} />
                     </div>
-
                     <div>
                         <h3>Address</h3>
                         <input type="text" placeholder="Region/Commune" className="prop_input" value={region}
@@ -205,3 +227,5 @@ export const RentListingComponent = ({authStatus, logout}) => {
         </div>
     );
 }
+
+    //

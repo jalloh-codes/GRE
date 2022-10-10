@@ -1,13 +1,16 @@
-const nodemailer = require("nodemailer");
-const User = require('../Models/User');
-const fs =  require('fs')
-const path = require('path')
-const hbs = require('handlebars')
-const { GraphQLError } = require('graphql');
-const smtpTransport = require('nodemailer-smtp-transport');
-const NewCode = async (file, locals) =>{
+import nodemailer from "nodemailer";
+import {User} from '../Models/User.js';
+import fs from 'fs'
+import path from 'path'
+import hbs from 'handlebars'
+import { GraphQLError } from 'graphql'
+import smtpTransport from 'nodemailer-smtp-transport';
+const __dirname = path.resolve();
+
+export const CodeMailer = async (file, locals) =>{
+    console.log(path.join(__dirname, '/Templates'));
     // Open template file
-    const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
+    const source = fs.readFileSync(path.join(__dirname, '/Templates', file), 'utf8');
     // Create email generator
     const template = hbs.compile(source);
     // let testAccount = await nodemailer.createTestAccount();
@@ -60,5 +63,3 @@ const NewCode = async (file, locals) =>{
     })
 
 }
-
-module.exports = NewCode;

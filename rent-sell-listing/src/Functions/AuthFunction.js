@@ -1,3 +1,5 @@
+
+
 // Validate email & password
 export const validateEmail = (email) =>{
     const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
@@ -47,4 +49,18 @@ export const validMatch= (password, matchPass) =>{
             success: true
         })
     }
+}
+
+
+export const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+        fileReader.onerror = (error) => {
+            reject(error);
+        };
+    });
 }
