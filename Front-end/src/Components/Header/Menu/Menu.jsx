@@ -1,40 +1,44 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Menu.css"
+
 // import "semantic-ui-css/semantic.min.css";
 
 
+export const Menu = ({authanticated, Logout}) => {
 
-export const Menu = () => {
     return (
 
-        <div class="ui menu header-menu">
-            <Link to="/" class="active item">
+        <div className="ui menu header-menu">
+            <Link to="/" className="active item">
                 Home
             </Link>
             <Link to="/aboutUS" className="item" replace={true}>
                 About Us
             </Link>
-            <Link to="/rent" class="item">
+            <Link to="/rent" className="item">
                 Rent
             </Link>
-            <Link to="/buy" class="item">
+            <Link to="/buy" className="item">
                 Buy
             </Link>
-            <Link to="/contactUs" class="item">
+            <Link to="/contactUs" className="item">
                 Contact US
             </Link>
-
-            <div class="right menu">
+            {authanticated ?
+            <div className="right menu">
+                <Link to="/signUp" className="SignUp" onClick={Logout}>Log out</Link>
+            </div>:
+            <div className="right menu">
                 <div id="google_translate_element"></div>
-                <Link to="/login" class="Login">
+                <Link to="/login" className="Login">
                     Login
                 </Link>
-                <Link to="/signUp" class="SignUp">
+                <Link to="/signUp" className="SignUp">
                     Sign up
                 </Link>
             </div>
-
+                }
         </div >
     );
 }

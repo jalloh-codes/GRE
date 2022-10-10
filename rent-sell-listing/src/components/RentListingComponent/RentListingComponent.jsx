@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
 import Form from 'react-bootstrap/Form';
@@ -11,9 +11,11 @@ import Loading from "../ApiHandling/Loading";
 import ErrorMSg from '../ApiHandling/ErrorMsg';
 import { useNavigate} from 'react-router-dom';
 import SuccessMsg from '../ApiHandling/SuccessMsg'
+import {authContext} from '../../Context/authContext';
 export const RentListingComponent = ({authStatus, logout}) => {
 
     const navigate = useNavigate()
+    const {authanticated} =  useContext(authContext);
     const[createProperty, {loading}] = useMutation(Add_Sell_Property)
     const[price, setPrice] = useState(0.0)
     const[propertyType, setPropertyType] = useState(String)
@@ -62,19 +64,24 @@ export const RentListingComponent = ({authStatus, logout}) => {
                 commune: commune,
                 images: images,
                 descriptions: descriptions,
-    
             }
         }).then(res =>{
-            console.log(res.data);
             const data  = res.data.createProperty
             setOnSuccess(data['message'])
         }).catch(err =>{
             setOnError(err["message"])
-            console.log(err);
         })
     }
 
-    console.log(images);
+    
+
+    useEffect(() =>{
+        if(authanticated){
+          return navigate('/makeChoice')
+        }else{
+          return navigate("/")
+        }
+      },[authanticated, navigate])
 
     if(loading){
         return

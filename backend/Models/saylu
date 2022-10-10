@@ -1,0 +1,6 @@
+Data = {name: '', phone:'', address:''}
+
+
+Name = data[‘name’]
+Phone = data[‘phone’]
+Address = data[‘address’]

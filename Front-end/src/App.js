@@ -1,53 +1,64 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { HeaderMainContainer } from './Components/Header/HeaderMainContainer';
 import BodyMainContainer from './Components/Body/BodyMainContainer'
 import { FooterMainContainer } from './Components/Footer/FooterMainContainer';
 import './App.css';
 import { LoginComponent } from './Components/LoginComponent/LoginComponent';
-import { SignUpComponent } from './Components/SignUpComponent/SignUpComponent';
+import { SignUpComponent }from './Components/SignUpComponent/SignUpComponent';
 import { AboutComponent } from './Components/AboutUS/AboutComponent';
 import { RentComponent } from './Components/RentComponent/RentComponent';
 import { BuyComponent } from './Components/BuyComponent/BuyComponent';
 import { SingleHome } from './Components/SingleHome/SingleHome'
 import { SimpleMap } from './Components/SingleHome/SimpleMap';
 import { ContactComponent } from './Components/ContactComponent/ContactComponent';
-import {
-  Routes,
-  Route
-} from 'react-router-dom';
+import { Routes, Route} from 'react-router-dom';
 import {useToken} from './Components/Api/useToken';
+import {authContext} from  './Context/authContext';
+import {Verification} from './Components/Verification/Verification'
 import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
-  import {onError} from '@apollo/client/link/error';
+import {onError} from '@apollo/client/link/error';
+import {ResetPassword} from './Components/ResetPassword/ResetPassword';
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
-      graphQLErrors.map(({ message, locations, path }) =>
-        console.log(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        ),
-      );
+      //graphQLErrors.map(({ message, locations, path }) => [{ Message: message, Location: locations, Path: path}]
+        //console.log(''
+         // `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+        //),
+      // );
   
     if (networkError){
-      console.log(`[Network error]: ${networkError}`);
+      networkError.map(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
     }
   });
 
   const link = from([
     errorLink,
-     new HttpLink({uri: "http://192.168.1.32:8080/gre"}), 
+     new HttpLink({uri: "http://localhost:8080/gre"}), 
   ])
 
   const authMiddleware = new ApolloLink((operation, forward) => {
     // add the authorization to the headers
-    const token = localStorage.getItem('token');
-  
-    operation.setContext(({ headers = {} }) => ({
-      headers: {
-        ...headers,
-        authorization: JSON.parse(token) || null,
-      }
-    }));
+    const { token } = useToken();
+    if(token.authanticated){
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers,
+          authorization: token.token,
+        }
+      }));
+    }else{
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers
+        }
+      }));
+    }
   
     return forward(operation);
   })
@@ -59,14 +70,18 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
 
 function App() {
 
-  const { token, setToken, logout} = useToken();
+  const { token} = useToken();
   const [authStatus, setAuthStatus] =  useState(false)
+  const [authanticated, setAuthanticated] = useState(false)
 
+  useEffect(() =>{
+    setAuthanticated(token.authanticated)
+  },[token, authanticated])
+  
   return (
+    <authContext.Provider value={{authanticated, setAuthanticated}}>
     <ApolloProvider  client={client}>
     <div className="App">
-
-
       <Routes>
         <Route path="/" element={
         <>
@@ -74,8 +89,10 @@ function App() {
               <BodyMainContainer />
               <FooterMainContainer />
         </>} />
+        <Route  path="verify" element={<Verification />} />
         <Route path="login" element={<LoginComponent />} />
         <Route path="signUp" element={<SignUpComponent />} />
+        <Route path="resetpassword" element={<ResetPassword />}/>
         <Route path="aboutUS" element={<AboutComponent />} />
         <Route path="rent" element={<RentComponent />} />
         <Route path="buy" element={<BuyComponent />} />
@@ -85,10 +102,7 @@ function App() {
       </Routes>
     </div>
     </ApolloProvider> 
+    </authContext.Provider>
   );
 }
-
 export default App;
-
-
-// react-google-maps

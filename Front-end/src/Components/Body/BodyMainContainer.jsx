@@ -8,7 +8,7 @@ import maison_blanche from './maison_blanche.jpeg';
 import onomo from './onomo.webp';
 import riviera from './riviera.jpeg';
 import{useQuery} from '@apollo/client';
-import {GTE_PROPERTIES}  from '../Api/query'
+import {GTE_PROPERTIES}  from '../Api/query';
 import { SingleHome } from '../SingleHome/SingleHome'
 
 

@@ -8,7 +8,7 @@ export const FooterMainContainer = () => {
         <div className='footer--main-container'>
             <div className="footer_text">
 
-                <text>Copyright © 2022 Guinea Real Estate LLC, Inc. All rights reserved Privacy Terms</text>
+                <p>Copyright © 2022 Guinea Real Estate LLC, Inc. All rights reserved Privacy Terms</p>
             </div>
             <div className="footer_logo">
                 <img src={Footer} alt="logo" />

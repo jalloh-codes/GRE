@@ -1,49 +1,85 @@
-import React, {useState, useEffect} from "react";
-import { Header } from "../Header/Header";
-import { Footer } from "../Footer/Footer";
-import { Link } from "react-router-dom"; // to be checked
-import "./LoginComponent.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, {useState, useEffect, useContext} from "react";
+import './LoginComponent.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { useMutation } from '@apollo/client';
-import Loading from '../ApiHandling/Loading';
-import ErrorMSg from '../ApiHandling/ErrorMsg';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Header } from '../Header/Header'
+import { Footer } from '../Footer/Footer'
 import {LOGIN} from '../Api/mutation'
-import { useNavigate} from 'react-router-dom'
+import { useMutation} from '@apollo/client';
+import {useNavigate, Link} from 'react-router-dom';
+import {Verification} from  '../Verification/Verification';
+import Alert from 'react-bootstrap/Alert';
+import {useToken} from  '../Api/useToken';
+import {authContext} from  '../../Context/authContext'
 
-export const LoginComponent = ({setToken, authStatus}) => {
-
-    const [login, {loading}] = useMutation(LOGIN)
+export const LoginComponent = () => {
+    const {setAuthanticated} =  useContext(authContext);
+    const { token } = useToken();
+    const [Login ] = useMutation(LOGIN)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [onError, setOnError]  = useState('')
-    const navigate = useNavigate()
-    const submit = (e) =>{
+    const [onError, setOnError]  = useState({name: '', message: ''});
+    const [resetNav, setResetnav] = useState(false);
+    const [show, setShow] = useState(false);
+    let navigate =  useNavigate();
+
+    const submit =  async (e) =>{
         e.preventDefault();
-        login({
+        localStorage.removeItem('token')
+        localStorage.removeItem('authanticated')
+        localStorage.removeItem('user')
+        Login({
             variables:{
                 email: email,
                 password: password,
             }
-        })
-        .then(res =>{
-            const data  = res.data.login
-            setToken(data.token)
-            localStorage.setItem('user', JSON.stringify(data.user))
-            return navigate('/makeChoice')
-        }).catch(err=>{
-            setOnError(err["message"])
+        }).then(res =>{
+            const data  = res.data.Login
+            if(data){
+                localStorage.setItem('listingAccess', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user))
+                localStorage.setItem('authanticated', true)
+                setAuthanticated(true)
+            }
+        }).catch((err) =>{
+            const jsonError =  JSON.parse(err.message)
+            setOnError(jsonError)
         })
     }
 
+
+    
+    useEffect(() =>{
+        if(onError.name){
+            setShow(true)
+        }
+    },[onError])
+
+    useEffect(() =>{
+        if(token.token && token.authanticated){
+            navigate('/makeChoice')
+        }else{
+            navigate('/')  
+        }
+    },[token.authanticated, navigate])
+    
     return (
         <div className="App">
-            <Header />
-            {onError && <ErrorMSg msg={onError} />}
-            {loading ?
-            <Loading />:
+            <div className="head_top_contains">
+                <Header />
+            </div>
+          
+            {!resetNav ? 
             <Form className="Login_form_container" onSubmit={submit}>
+                 {show && 
+                    <Alert variant={'danger'} onClose={() => setShow(false)} dismissible>{onError.message}</Alert>
+                }
+                {onError.name !== 'authan' && 
+                    <Link to={onError.name === 'verify' ?'/verify' : '/signup'} className="center-link">
+                        {onError.message}
+                    </Link>
+                }
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control type="email" placeholder="Enter email" 
@@ -52,23 +88,17 @@ export const LoginComponent = ({setToken, authStatus}) => {
                         We'll never share your email with anyone else.
                     </Form.Text>
                 </Form.Group>
-
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" placeholder="Password" 
                     value={password} autoComplete="current-password" onChange={(e) => setPassword(e.target.value)} required/>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check type="checkbox" label="Check me out" />
-                </Form.Group>
-                {/* <Link to="/makeChoice" > */}
-                <Button variant="primary" type="submit">
-                    Submit
-                </Button>
-                {/* </Link> */}
-            </Form>
-            }
-
+                {/* <button onClick={resetPassNav} className="resend-button sent-label">Forgot my password</button> */}
+                <Link to="/resetpassword" state={{resetPass: true}}  className="center-text">
+                    Forgot my password</Link>
+                <Button variant="primary" type="submit">Submit</Button>  
+            </Form>:
+           <Verification getEmail={''} reset={true} emailLabel={'Send Code'}/>}
             <Footer />
         </div>
     );

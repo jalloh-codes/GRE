@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Roles = require('./Roles')
 const schema = mongoose.Schema;
-
+const AllowRoles = require('../Config/AllowRoles')
 const VerifyRole = async (role) =>{
     console.log(role);
     const roles  =  await Roles.findById({_id: role})
@@ -54,24 +54,14 @@ const UserSchema =  new schema({
         required: true,
         hide: true
     },
-    UserType:{
-        type: String,
+    role:{
+        type: Number,
         enum: {
-            values: ['BuyOrRent', 'Listing'],
-            message:'{VALUE} must be BuyOrRent or Listing'
+            values: Object.values(AllowRoles),
+            message:'{VALUE} not accepted.'
         },
         required: true
     },
-    admin:{
-        type: Boolean,
-        default: false
-    },
-    roles:[{
-            type: schema.Types.ObjectId,
-            ref: "Role",
-            required: [true, 'Roles is empty'],
-            validate:[VerifyRole, 'role not valid']
-    }],
     verified:{
         type: Boolean,
         default: false

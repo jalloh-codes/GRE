@@ -1,6 +1,9 @@
-const {buildSchema } = require('graphql')
+const {buildSchema} = require('graphql')
+// const {} = require('./scalarTypes')
 
 module.exports = buildSchema(`
+    scalar role 
+
     type Role{
         _id: ID!
         name: String
@@ -11,7 +14,7 @@ module.exports = buildSchema(`
         firstname: String
         lastname: String
         email: String
-        password: String
+        role: String
         phoneNumber: String!
     }
     type Location{
@@ -57,8 +60,6 @@ module.exports = buildSchema(`
     type AirBnB{
         _id: ID
         lister: Lister
-        start_date: String
-        end_date: String
         reservation: [Reservation]
         videos: [String]
         loc: Location
@@ -75,6 +76,11 @@ module.exports = buildSchema(`
         end_date: String
         price: Float
         update_at: String
+    } 
+
+    type Verify{
+        user: User
+        code: String
     }
 
     input createUser{
@@ -109,6 +115,28 @@ module.exports = buildSchema(`
         wifi: Boolean
     }
 
+    input airbnbInput{
+        studio: Boolean
+        length: Int
+        width: Int
+        bed: Int!
+        bath: Int!
+        images: [String]!
+        name: String
+        propertyType: String
+        built: Int
+        price: Float!
+        descriptions: String
+        region: String!
+        commune: String!
+        lat: Float!
+        lng: Float!
+        parking: Boolean
+        airCondition: Boolean
+        furnished: Boolean
+        wifi: Boolean
+    }
+
     input search{
         location: String
         priceMin: Float
@@ -120,30 +148,68 @@ module.exports = buildSchema(`
         parking: Boolean
     }
 
+    input searchAirBnb{
+        start: String
+        end: String
+        location: String
+        priceMin: Float
+        priceMax: Float
+        bedMin: Int
+        bedMax: Int
+        bathMin: Int
+        bathMax: Int
+        parking: Boolean
+        airCondition: Boolean
+        wifi: Boolean
+        furnished: Boolean
+        propertyType: String
+    }
+
     type Status{
         status: Boolean
         message: String
     }
 
+    type VerifyStatus{
+        session: String
+        status: Boolean
+        message: String
+    }
+    type SignUpStatus{
+        account: Boolean
+        verification: Boolean
+        message: String
+    }
+
     type listing{
-        properties:  [Property]
+        properties: [Property]
+    }
+    type ListingAirBnb{
+        airbnb: [AirBnB]
     }
 
     type AuthPayload {
         token: String!
         user: Lister
     }
+
+
     
     type RootQuery {
         getProperty(input: search): listing
+        getAirBnb(input: searchAirBnb): ListingAirBnb
     }
 
     type RootMutation {
         createRole(name: String!): Status
-        signup(input: createUser): Status
-        login(email: String!, password: String!): AuthPayload
+        SignUp(input: createUser): SignUpStatus
+        Login(email: String!, password: String!): AuthPayload
         createProperty(input: createProperty):Status
+        createAirBnb(input: airbnbInput):Status
         checkoutHome(place: ID, from: String): Status
+        sendVerification(email: String!): Status
+        resetPassword(oldPassword: String, newPassword: String!, email: String): Status
+        VerifyAccount(user: String!, code: String!): VerifyStatus
     }
 
     schema{

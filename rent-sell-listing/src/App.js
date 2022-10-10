@@ -13,7 +13,10 @@ import { SignUpComponent } from './components/SignUpComponent/SignUpComponent';
 import { Rent_or_sell_Component } from './components/Rent_or_sell_Component/Rent_or_sell_Component';
 import { RentListingComponent } from './components/RentListingComponent/RentListingComponent';
 import { SellListingComponent } from './components/SellListingComponent/SellListingComponent';
-import {useToken} from './components/Api/useToken'
+import {useToken} from './components/Api/useToken';
+import {Verification} from './components/Verification/Verification'
+import {authContext} from  './Context/authContext';
+import {ResetPassword} from './components/ResetPassword/ResetPassword'
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
@@ -23,38 +26,32 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       ),
     );
 
-  if (networkError){
-    console.log(`[Network error]: ${networkError}`);
-  }
+  if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
 
 const link = from([
   errorLink,
-   new HttpLink({uri: "http://192.168.1.32:8080/gre"}), 
+   new HttpLink({uri: "http://localhost:8080/gre"}), 
 ])
-
-// const authMiddleware = ApolloLink((operation, forward) => {
-//   const token = localStorage.getItem('token')
-//   operation.setContext(({headers ={}}) =>({
-//     headers:{
-//       ...headers,
-//       authorization: localStorage.getItem('token') || null
-//     }
-//   }));
-//   return forward(operation)
-// });
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   // add the authorization to the headers
-  const token = localStorage.getItem('token');
-
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      authorization: JSON.parse(token) || null,
-    }
-  }));
+  const { token } = useToken();
+  if(token.authanticated){
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        authorization: token.token,
+      }
+    }));
+  }else{
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers
+      }
+    }));
+  }
 
   return forward(operation);
 })
@@ -64,44 +61,52 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-
 function App() {
   
   const navigate = useNavigate()
-  const { token, setToken, logout} = useToken();
+  const { token} = useToken();
   const [authStatus, setAuthStatus] =  useState(false)
-
+  const [authanticated, setAuthanticated] = useState(token.authanticated)
 
   useEffect(() =>{
-    if(token){
-      setAuthStatus(true)
+    setAuthanticated(token.authanticated)
+  },[token, authanticated])
+  
+  useEffect(() =>{
+    if(token.authanticated){
       return navigate('/makeChoice')
     }else{
-      return navigate('/')
+      return navigate("/")
     }
-    
-    
-    
-  },[])
+  },[authanticated])
+
+  console.log(localStorage.getItem('email') ? 'a' : 'b') ;
+
 
   return(
+    <authContext.Provider value={{authanticated, setAuthanticated}}>
     <ApolloProvider  client={client}>
       <div className="App">
         <Routes>
-          {token && authStatus ?
+          {authanticated ?
           <>
-          <Route path="/makeChoice" element={<Rent_or_sell_Component  authStatus={authStatus} logout={logout}/>} />
-          <Route path="/rentlisting" element={<RentListingComponent  authStatus={authStatus} logout={logout}/>} />
-          <Route path="/selllisting" element={<SellListingComponent authStatus={authStatus} logout={logout}/>} />
+          <Route path="/makeChoice" element={<Rent_or_sell_Component  />} />
+          <Route path="/rentlisting" element={<RentListingComponent  />} />
+          <Route path="/selllisting" element={<SellListingComponent/>} />
+          <Route  path="verify" element={<Verification />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
           </>:
           <>
-          <Route path="/" element={<LoginComponent setToken={setToken} authStatus={authStatus} logout={logout}/>} />
-          <Route path="/sign-up" element={<SignUpComponent authStatus={authStatus} logout={logout}/>} />
+          <Route exact path="/" element={<LoginComponent />} />
+          <Route path="/signup" element={<SignUpComponent />} />
+          <Route path="/resetpassword" element={<ResetPassword />} />
+          <Route  path="verify" element={<Verification />} />
           </>
           }
       </Routes>
       </div>
       </ApolloProvider> 
+      </authContext.Provider>
   );
 }
 

@@ -1,22 +1,25 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
-const AirBnB = new Schema({
+const schemaAirBnB = new Schema({
     lister:{
-        type: schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
-    start_date:{
-        type: Date,
-        required: true
-    },
-    end_date:{
-        type: Date,
-        required: true
+    // start_date:{
+    //     type: Date,
+    //     required: true
+    // },
+    // end_date:{
+    //     type: Date,
+    //     required: true
+    // },
+    name:{
+        type: String
     },
     reservation:[
-        {type: schema.Types.ObjectId,
+        {type: Schema.Types.ObjectId,
         ref: "Reservation"}
     ],
     loc:{
@@ -104,4 +107,20 @@ const AirBnB = new Schema({
 })
 
 
-module.exports = AirBnB = mongoose.model('AirBnB', AirBnB)
+module.exports = AirBnB = mongoose.model('AirBnB', schemaAirBnB)
+
+
+
+// images: [
+//     {
+//         url: String,
+//         public_id: String
+//     }
+// ],
+
+// availability: [
+//     {
+//         from: String,
+//         to:	  String
+//     }
+// ],
