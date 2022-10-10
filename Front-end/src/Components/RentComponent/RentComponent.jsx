@@ -9,6 +9,13 @@ import { SearchComponent } from "../Header/searchComponent/SearchComponent";
 import { SingleHome } from "../SingleHome/SingleHome";
 import { BookingDates } from "../BookingDates/BookingDates";
 
+
+// GRAPHQL API CALL
+import{useQuery} from '@apollo/client';
+import {GTE_PROPERTIES}  from '../Api/query';
+
+
+
 import pict0 from "../../pictures/pict1.webp";
 import pict1 from "../../pictures/pict2.webp";
 import pict2 from "../../pictures/pict3.webp";
@@ -37,16 +44,32 @@ export const RentComponent = () => {
     //post will hold the data from the backend
     const [post, setPost] = React.useState(null);
 
-
+    // GRAPHQL PROPERTY API
+    // USE THIS properties
+    const [properties, setProperties] = useState();
+    const {data, error, loading} =  useQuery(GTE_PROPERTIES,{
+        variables:{
+            location: "Ratoma"
+        }
+    });
+    // END
 
     React.useEffect(() => {
         axios.get(baseURL).then((response) => {
             setPost(response.data);
         });
+        if(data){
+            setProperties(data.getProperty.properties)
+        }
     }, []);
     const callback = useCallback((value) => {
         setValue(value);
     }, []);
+
+
+    console.log('====================================');
+    console.log(properties);
+    console.log('====================================');
 
     // To be improved
     let bar_number = [];
@@ -95,6 +118,8 @@ export const RentComponent = () => {
         setChecked(false)
 
     }
+
+
     //
     if (!post) return null;
     return (
