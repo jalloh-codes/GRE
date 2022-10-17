@@ -30,7 +30,7 @@ export const SellListingComponent = () => {
                     </div>
                     <div className="property_pictures">
                         <p>Upload property pictures</p>
-                        <input type="file" />
+                        <input type="file" accept="image/*" />
                     </div>
                 </div>
                 <div className="rest_of_the_info">
