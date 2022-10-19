@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import './searchComponent.css'
 
 
 export const SearchComponent = ({ parentCallback }) => {
@@ -11,8 +10,8 @@ export const SearchComponent = ({ parentCallback }) => {
     };
     return (
 
-        <div className="ui category search">
-            <div className="ui icon input">
+        <div >
+            <div >
                 <input className="prompt" type="text" value={value}
                     placeholder="Search city..." onChange={handleChange} />
                 <i className="search icon"></i>
