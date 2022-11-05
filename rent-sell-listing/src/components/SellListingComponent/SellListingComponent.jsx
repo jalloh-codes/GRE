@@ -19,7 +19,11 @@ export const SellListingComponent = () => {
                             </div>
                             <div>
                                 <label>Property type</label>
-                                <input type="text" placeholder="ex: house/land/building" className="prop_input" />
+                                <select name="property_type" className="prop_input">
+                                    <option value="volvo">building</option>
+                                    <option value="saab"> house</option>
+                                    <option value="mercedes">Land</option>
+                                </select>
                             </div>
                             <div>
                                 <label>Property price</label>
@@ -30,7 +34,7 @@ export const SellListingComponent = () => {
                     </div>
                     <div className="property_pictures">
                         <p>Upload property pictures</p>
-                        <input type="file" />
+                        <input type="file" accept="image/*" />
                     </div>
                 </div>
                 <div className="rest_of_the_info">
