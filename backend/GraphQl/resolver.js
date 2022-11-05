@@ -1,19 +1,18 @@
-const User = require('../Models/User');
-const jwt  = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const Property = require('../Models/Property')
-const AllowRoles = require('../Config/AllowRoles')
-const {BuyOrRent, Listing, functionality} =  require('../Config/functionality')
-const mongoose = require('mongoose');
-const { populate } = require('../Models/Roles');
-const AirBnB = require('../Models/AirBnB');
-const Verify = require('../Models/Verify')
-const { GraphQLError } = require('graphql');
+import {User} from '../Models/User.js';
+import jwt  from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import {Property} from '../Models/Property.js'
+import {AllowRoles} from '../Config/AllowRoles.js'
+import {BuyOrRent, Listing, functionality} from '../Config/functionality.js'
+import {AirBnB}  from '../Models/AirBnB.js';
+import {Verify} from '../Models/Verify.js'
+import { GraphQLError } from 'graphql';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 // const Mailer = require('../Mailer/CodeMailer');
-const CodeMailer =  require('../Mailer/CodeMailer')
-// const {} = require
-const GraphQRole = require('./scalarTypes');
-const crypto =  require('crypto')
+import {CodeMailer} from '../Mailer/CodeMailer.js'
+import crypto, { randomBytes } from 'crypto';
+import {propertyImageUpload, getFileReadStrem}  from '../Config/aws.js'
+import { Review } from '../Models/Review.js';
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -32,19 +31,18 @@ const validatePassword = (password) =>{
     }
 }
 
-
 // get key by a value
 const getObjKey = (obj, value) => {
     return Object.keys(obj).find(key => obj[key] === value);
 }
 
 // verify authantication and authorization
-const VerifyAuthorization = async (req, allowed) =>{
+const VerifyAuthorization = async (req) =>{
     const id =  req._id
     const user = await User.findById(id, {verified: 1, role:1});
 
     const role = AllowRoles[req.authorization]
-    
+    console.log('role', req.authorization);
     if(role !== user.role) throw new GraphQLError("Role not valid")
     return req.authorization
 }
@@ -53,6 +51,7 @@ const user = async (id) =>{
     const user = await User.findOne({_id: id},{password: 0});
     return user
 }
+
 const AuthPayloadUser = async (email) =>{
     const user = await User.findOne({email: email})
     if (!user) throw new GraphQLError(JSON.stringify({name:'account', message:'Account does not exists!'}))
@@ -70,6 +69,7 @@ const building =  async (bdID) =>{
     }
 
 }
+
 const allBuildings = async () =>{
     const buildings  = await Building.find()
     return buildings.map(build =>{
@@ -80,8 +80,8 @@ const allBuildings = async () =>{
     })
 }
 
-const resolver = {
-
+export const resolvers  = {
+    Upload: GraphQLUpload,
     SignUp: async (args, req) =>{
         try{
 
@@ -136,6 +136,7 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
+
     Login: async (args, req) =>{ 
         try{
         const email = args.email
@@ -181,45 +182,68 @@ const resolver = {
     }
     },
 
-    createProperty: async (args, req) =>{ 
+    createProperty: async ({input}, req) =>{ 
         try{
             const auth = req.auth
             const verify = await VerifyAuthorization(auth)
-            if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task")
+
+            if(!(verify !== "Admin" || verify !== "Listing")) throw new GraphQLError("Not Authorize to perform this task")
+
+            let {imagesArray,studio,quantity,
+            length,width,bed,bath,propertyType,
+            price,descriptions,region,commune,
+            lat,lng,parking,airCondition,
+            furnished,wifi,built} = await input
+
+            const file = await input.profile.file
+            const {filename} =  await file
+
+            const bytes = await randomBytes(16).toString('hex')
+            const pofile_filename = bytes + '-' + auth._id + '-'+ Date.now() + filename
         
-            const Newstudio =  new Property({
+            const profileImage =  await propertyImageUpload(file, pofile_filename);
+
+            let propertyImageType = {
+                profile: profileImage.Key,
+                imagesArray: imagesArray ? imagesArray : []
+            }
+            const newProperty =  new Property({
                 lister: auth._id,
-                images: args.input.images,
-                videos: args.input.videos,
-                propertyType:  args.input.propertyType,
+                images: propertyImageType,
+                // videos: videos,
+                propertyType:  propertyType,
                 details:{
-                    studio: args.input.studio,
-                    length: args.input.length,
-                    width: args.input.width,
-                    bed: args.input.bed,
-                    bath: args.input.bath,
-                    parking: args.input.parking,
-                    built: args.input.built,
-                    price:args.input.price,
+                    studio: studio,
+                    length: length,
+                    width: width,
+                    bed: bed,
+                    bath: bath,
+                    parking: parking,
+                    built: built,
+                    price: price,
+                    airCondition: airCondition,
+                    furnished: furnished,
+                    wifi: wifi
                 },
                 loc:{
-                    region: args.input.region,
-                    commune: args.input.commune,
-                    lat: args.input.lat,
-                    lng: args.input.lng
+                    region: region,
+                    commune: commune,
+                    lat:lat,
+                    lng: lng
                 },
-                descriptions: args.input.descriptions,
-                quantity: args.input.quantity
+                descriptions: descriptions,
+                quantity: quantity
             })
-            await Newstudio.save()
-   
+            await newProperty.save()
             return{
                 status: true
             }
 
         }catch(error){
+            console.log(error);
             throw Error(error)
-        }    },
+        }    
+    },
 
     // Non Air BnB type 
     getProperty: async (args, req) =>{
@@ -375,6 +399,7 @@ const resolver = {
             throw Error(error)
         }    
     },
+
     // Air BnB
     getAirBnb: async (args, req) =>{
       
@@ -524,11 +549,12 @@ const resolver = {
             airbnb: airbnb,
         }
     },
+
     sendVerification: async (args, req) =>{
         try{
             
             const email =  args.email
-   
+            
             const user = await User.findOne({email: email},{_id: 1, email:1, firstname:1, lastname:1})
             let verify = await Verify.findOne({user: user._id},{code:1})
             
@@ -567,34 +593,38 @@ const resolver = {
                     code: hashCode
                 });
             }
-            let file = '../Templates/codeMailer.hbs'
+            let file = '/codeMailer.hbs'
             await CodeMailer(file, locals)
             const saved = await verify.save();
+            
             return{
                 status: saved ? true : false,
                 message: "Code sent to your email"
             }
         }catch(error){
+            console.log(error);
             throw Error(error, {status: false})
         }
     },
+// if the user is login then then use token to verify
+// else use email verification to reset.
     resetPassword: async (args, req) =>{
         try{
-            const auth = req?.auth
+            // const auth = req?.auth
             const email = args?.email
             const oldPassword =  args.oldPassword;
             const newPassword = args.newPassword;
             validatePassword(newPassword);
-
+            console.log(1);
             const getUser =  await User.findOne({email: email},{password: 1});
             const authanticate = await bcrypt.compareSync(oldPassword, getUser.password)
-            if(!authanticate) throw new  GraphQLError("Password is inccorect!")
+            // if(!authanticate) throw new  GraphQLError("Password is inccorect!")
           
            
             const password = await bcrypt.hash(newPassword, 12);
             getUser.password = password
             await getUser.save()
-
+            console.log(getUser);
             return{
                 status:true,
                 message:'Password successfuly reset'
@@ -603,6 +633,7 @@ const resolver = {
             throw Error(error, {status: false})
         }
     },
+
     VerifyAccount: async (args, req) =>{ 
         try{
             const email = args.user;
@@ -639,7 +670,60 @@ const resolver = {
         }catch(error){
             throw Error(error, {status: false})
         }
+    },
+
+    UploadImage: async (args, req) =>{
+
+        const file = await  args.file.file
+        const { filename } = await file;
+
+        const bytes = await randomBytes(16).toString('hex')
+        const pofile_filename = bytes + '-'+ Date.now() + filename
+    
+        const profileImage =  await propertyImageUpload(file, pofile_filename);
+
+        const getImage = await getFileReadStrem(profileImage.Key)
+        console.log(profileImage.Location);
+        console.log(getImage);
+        return{
+            status: true,
+            message: 'String'
+        }
+    },
+    getImage: async (args, req) =>{
+        try {
+            const fileKey = args.fileKey
+            // const bucket = args.from
+            //gre-image-property
+            const image = await getFileReadStrem(fileKey)
+            return{
+                image: image
+            }
+        } catch (error) {
+            throw Error(error)
+        }
+    },
+    createReview: async (args, req) =>{
+        try {
+            const auth = req.auth 
+            const {lister, property, range, statement, created_at} =  args.input
+            const verify = await VerifyAuthorization(auth)
+            if(verify !== "BuyOrRent" )  throw new GraphQLError("Not Authorize to perform this task");
+
+            const newReview = new Review({
+                lister: lister,
+                property: property,
+                range: range,
+                statement: statement,
+                created_at: created_at
+            })
+            newReview.save()
+            return{
+                status: true,
+                message: "New Added"
+            }
+        } catch (error) {
+            
+        }
     }
 }
-//,{$unwind: "$reservation"}
-module.exports = resolver
