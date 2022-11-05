@@ -12,6 +12,7 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 import {CodeMailer} from '../Mailer/CodeMailer.js'
 import crypto, { randomBytes } from 'crypto';
 import {propertyImageUpload, getFileReadStrem}  from '../Config/aws.js'
+import { Review } from '../Models/Review.js';
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -36,12 +37,12 @@ const getObjKey = (obj, value) => {
 }
 
 // verify authantication and authorization
-const VerifyAuthorization = async (req, allowed) =>{
+const VerifyAuthorization = async (req) =>{
     const id =  req._id
     const user = await User.findById(id, {verified: 1, role:1});
 
     const role = AllowRoles[req.authorization]
-    
+    console.log('role', req.authorization);
     if(role !== user.role) throw new GraphQLError("Role not valid")
     return req.authorization
 }
@@ -605,7 +606,8 @@ export const resolvers  = {
             throw Error(error, {status: false})
         }
     },
-
+// if the user is login then then use token to verify
+// else use email verification to reset.
     resetPassword: async (args, req) =>{
         try{
             // const auth = req?.auth
@@ -700,6 +702,29 @@ export const resolvers  = {
         } catch (error) {
             throw Error(error)
         }
+    },
+    createReview: async (args, req) =>{
+        try {
+            const auth = req.auth 
+            const {lister, property, range, statement, created_at} =  args.input
+            console.log(args.input);
+            const verify = await VerifyAuthorization(auth)
+            if(verify !== "BuyOrRent" )  throw new GraphQLError("Not Authorize to perform this task");
+
+            const newReview = new Review({
+                lister: lister,
+                property: property,
+                range: range,
+                statement: statement,
+                created_at: created_at
+            })
+            newReview.save()
+            return{
+                status: true,
+                message: "New Added"
+            }
+        } catch (error) {
+            
+        }
     }
 }
-

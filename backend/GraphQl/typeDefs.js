@@ -76,6 +76,14 @@ export const typeDefs = buildSchema(`
         active: Boolean
     }
 
+    type Review{
+        lister: User
+        property: AirBnB
+        range: Int
+        statement: String
+        created_at: String
+    }
+
     type Reservation{
         lister: Lister
         airBnB: AirBnB
@@ -173,6 +181,14 @@ export const typeDefs = buildSchema(`
         propertyType: String
     }
 
+    input review{
+        lister: ID!
+        property: ID!
+        range: Int
+        statement: String
+        created_at: String
+    }
+
     type Status{
         status: Boolean
         message: String
@@ -221,6 +237,7 @@ export const typeDefs = buildSchema(`
         resetPassword(oldPassword: String, newPassword: String!, email: String): Status
         VerifyAccount(user: String!, code: String!): VerifyStatus
         UploadImage(file: Upload): Status
+        createReview(input: review): Status
     }
 
     schema{

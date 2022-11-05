@@ -1,19 +1,18 @@
-import mongoose from "mongoose";
-const Schema =  mongoose.Schema
+import {Schema, ObjectId, model} from "mongoose";
 
 const ReviewSchema =  new Schema({
     lister:{
-        type: schema.Types.ObjectId,
+        type: ObjectId,
         ref: "User",
         required: true
     },
     property:{
-        type: schema.Types.ObjectId,
+        type: ObjectId,
         ref: "AirBnB",
         required: true
     },
     range:{
-        type: Int,
+        type: Number,
         min: 0,
         max: 5,
         required: true
@@ -27,4 +26,4 @@ const ReviewSchema =  new Schema({
     }
 })
 
-export const Review = mongoose.Schema('Review', ReviewSchema)
+export const Review = model('Review', ReviewSchema)
