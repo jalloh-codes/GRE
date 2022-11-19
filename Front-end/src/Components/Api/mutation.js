@@ -63,3 +63,11 @@ mutation createProperty($studio: Boolean, $descriptions: String, $airCondition: 
   }
 }
 `
+export const Add_Review =  gql`
+mutation createReview($property: ID!, $range: Int!, $statement: String, $created_at: String!){
+  createReview(input:{property: $property, range: $range, statement: $statement, created_at: $created_at}){
+    status
+    message
+  }
+}
+`

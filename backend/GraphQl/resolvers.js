@@ -186,7 +186,6 @@ export const resolvers  = {
         try{
             const auth = req.auth
             const verify = await VerifyAuthorization(auth)
-
             if(!(verify !== "Admin" || verify !== "Listing")) throw new GraphQLError("Not Authorize to perform this task")
 
             let {imagesArray,studio,quantity,
@@ -674,6 +673,10 @@ export const resolvers  = {
 
     UploadImage: async (args, req) =>{
 
+        const auth = req.auth 
+        const verify = await VerifyAuthorization(auth)
+        if(verify !== "Admin"  || verify !== "Listing")  throw new GraphQLError("Not Authorize to perform this task");
+
         const file = await  args.file.file
         const { filename } = await file;
 
@@ -683,8 +686,8 @@ export const resolvers  = {
         const profileImage =  await propertyImageUpload(file, pofile_filename);
 
         const getImage = await getFileReadStrem(profileImage.Key)
-        console.log(profileImage.Location);
-        console.log(getImage);
+        // console.log(profileImage.Location);
+        // console.log(getImage);
         return{
             status: true,
             message: 'String'
@@ -693,8 +696,6 @@ export const resolvers  = {
     getImage: async (args, req) =>{
         try {
             const fileKey = args.fileKey
-            // const bucket = args.from
-            //gre-image-property
             const image = await getFileReadStrem(fileKey)
             return{
                 image: image
@@ -703,11 +704,11 @@ export const resolvers  = {
             throw Error(error)
         }
     },
+    
     createReview: async (args, req) =>{
         try {
             const auth = req.auth 
             const {lister, property, range, statement, created_at} =  args.input
-            console.log(args.input);
             const verify = await VerifyAuthorization(auth)
             if(verify !== "BuyOrRent" )  throw new GraphQLError("Not Authorize to perform this task");
 
@@ -721,7 +722,7 @@ export const resolvers  = {
             newReview.save()
             return{
                 status: true,
-                message: "New Added"
+                message: "New Review added"
             }
         } catch (error) {
             

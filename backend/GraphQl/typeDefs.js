@@ -182,11 +182,10 @@ export const typeDefs = buildSchema(`
     }
 
     input review{
-        lister: ID!
         property: ID!
-        range: Int
+        range: Int!
         statement: String
-        created_at: String
+        created_at: String!
     }
 
     type Status{
