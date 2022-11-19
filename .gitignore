@@ -19,7 +19,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
-
+data.json
 #ignore node_modules
 node_modules
 
