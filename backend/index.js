@@ -20,7 +20,7 @@ const corsOptions = {
   credentials: true 
 }
 //corsOptions
-app.use(cors(corsOptions))
+app.use(cors({origin: "*",  }))
 const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
