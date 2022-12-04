@@ -37,7 +37,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 // ])
 
 const uploadLink = createUploadLink({
-  uri: 'http://localhost:8080/gre',
+  uri: 'https://gre-network-api.herokuapp.com/gre',
   errorLink
 });
 // const link = createUploadLink([
