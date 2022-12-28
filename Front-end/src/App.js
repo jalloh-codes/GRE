@@ -39,7 +39,7 @@ import {ResetPassword} from './Components/ResetPassword/ResetPassword';
 
   const link = from([
     errorLink,
-     new HttpLink({uri: "https://gre-network-api.herokuapp.com/gre"}), 
+     new HttpLink({uri: "https://gre-api-app.onrender.com/gre"}), 
   ])
 
   const authMiddleware = new ApolloLink((operation, forward) => {
