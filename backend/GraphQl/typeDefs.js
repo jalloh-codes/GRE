@@ -1,7 +1,4 @@
 import {buildSchema}  from 'graphql'
-import { gql } from 'apollo-server-express';
-// const {} = require('./scalarTypes')
-
 
 export const typeDefs = buildSchema(`
     scalar role 

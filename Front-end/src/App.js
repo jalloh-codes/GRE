@@ -19,15 +19,10 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
 import {onError} from '@apollo/client/link/error';
 import {ResetPassword} from './Components/ResetPassword/ResetPassword';
-
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors)
-      //graphQLErrors.map(({ message, locations, path }) => [{ Message: message, Location: locations, Path: path}]
-        //console.log(''
-         // `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        //),
-      // );
+import {api_link} from './enviroment'
   
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors)
     if (networkError){
       networkError.map(({ message, locations, path }) =>
       console.log(
@@ -39,7 +34,7 @@ import {ResetPassword} from './Components/ResetPassword/ResetPassword';
 
   const link = from([
     errorLink,
-     new HttpLink({uri: "https://gre-api-app.onrender.com/gre"}), 
+     new HttpLink({uri: api_link}), 
   ])
 
   const authMiddleware = new ApolloLink((operation, forward) => {

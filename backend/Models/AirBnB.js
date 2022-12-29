@@ -7,14 +7,6 @@ const schemaAirBnB = new Schema({
         ref: "User",
         required: true
     },
-    // start_date:{
-    //     type: Date,
-    //     required: true
-    // },
-    // end_date:{
-    //     type: Date,
-    //     required: true
-    // },
     name:{
         type: String
     },

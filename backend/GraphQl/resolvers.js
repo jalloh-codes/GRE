@@ -3,7 +3,6 @@ import jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import {Property} from '../Models/Property.js'
 import {AllowRoles} from '../Config/AllowRoles.js'
-import {BuyOrRent, Listing, functionality} from '../Config/functionality.js'
 import {AirBnB}  from '../Models/AirBnB.js';
 import {Verify} from '../Models/Verify.js'
 import { GraphQLError } from 'graphql';
@@ -40,7 +39,6 @@ const getObjKey = (obj, value) => {
 const VerifyAuthorization = async (req) =>{
     const id =  req._id
     const user = await User.findById(id, {verified: 1, role:1});
-
     const role = AllowRoles[req.authorization]
     console.log('role', req.authorization);
     if(role !== user.role) throw new GraphQLError("Role not valid")
@@ -301,7 +299,6 @@ export const resolvers  = {
                 let data = {'details.parking': parking}
                 Object.assign(match, data);
             }
-        
         
             if(location != undefined){
                 search = { $search: {index: 'property',

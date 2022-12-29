@@ -1,14 +1,6 @@
 import  mongoose from 'mongoose';
-// import Roles from './Roles'
 const schema = mongoose.Schema;
 import {AllowRoles} from '../Config/AllowRoles.js'
-// const VerifyRole = async (role) =>{
-//     console.log(role);
-//     const roles  =  await Roles.findById({_id: role})
-
-//     return roles ? true: false
-// }
-
 
 const UserSchema =  new schema({
     firstname:{

@@ -7,28 +7,36 @@ import {typeDefs} from './GraphQl/typeDefs.js'
 import {resolvers} from './GraphQl/resolvers.js'
 import {authMiddleware} from'./middleware/auth.js'
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
-
-//   graphqlUploadExpress, // A Koa implementation is also exported.
-// } = require('graphql-upload');
+import { GraphQLError } from 'graphql';
 import * as dotenv from 'dotenv'
 dotenv.config()
 const port = process.env.PORT || 8080;
 const app = express();
+
+const allowedOrigin = ['http://localhost:3000', 'http://10.15.85.21:3000',
+'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com/']
+
 const corsOptions = {
-  origin: ['http://192.168.1.32:3000', 'http://localhost:3000'],
   optionsSuccessStatus: 200,
-  credentials: true 
+  credentials: true,
+  origin: function (origin, callback){
+        if(allowedOrigin.indexOf(origin) === -1){
+          let msg = 'The CORS policy for this site does not ' +
+                    'allow access from the specified Origin.';
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      }
 }
-//corsOptions
-app.use(cors({origin: "*",  }))
+
+app.use(cors(corsOptions))
 const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
-
-//graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 })
 app.use(authMiddleware);
 app.use(graphqlUploadExpress({ maxFileSize: 30000000, maxFiles: 10 }))
-// app.use(graphqlUploadExpress());
+
+
 app.use('/gre', 
   graphqlHTTP({
     schema: typeDefs,

@@ -1,6 +1,5 @@
 import { default as dotenv } from 'dotenv';
 dotenv.config();
-// import {aws} from 'aws-sdk';
 import  s3 from 'aws-sdk/clients/s3.js'
 import fs from 'fs'
 import path from 'path';

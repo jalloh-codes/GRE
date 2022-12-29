@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-
 export const authMiddleware = (req, res, next) =>{
     // console.log(req.get('authorization'));
     const authHeader = req.get('authorization');
@@ -16,11 +15,9 @@ export const authMiddleware = (req, res, next) =>{
   
     if(!token || token === '' || !bear ||  bear != 'Bearer'){
         req.isAuth =  false
-        
         return next();
     }
 
-    
     try {
        let decodeToken =  jwt.verify(token, process.env.SECRECT);
        
@@ -29,23 +26,12 @@ export const authMiddleware = (req, res, next) =>{
             return next();
         }
         
-        
        req.isAuth = true;
        req.auth  = decodeToken;
        
-   
        return next()
     } catch (error) {
         req.isAuth =  false
         return next();
     }
-    // if(!decodeToken){
-    //     req.isAuth =  false
-    //     return next();
-    // }
-
-    // req.isAuth = true;
-    // req.userID  = decodeToken.id;
-
-    // return next()
 }
