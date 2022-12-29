@@ -1,4 +1,4 @@
-export const enviroment =  process.env.NODE_ENV
+export const environment =  process.env.NODE_ENV
 
 const api = (env) =>{
     switch (env) {
@@ -13,4 +13,4 @@ const api = (env) =>{
 
 
 
-export const api_link = api(enviroment)
+export const api_link = api(environment)
