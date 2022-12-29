@@ -19,7 +19,7 @@ import {  ApolloClient, InMemoryCache, from, ApolloLink,
   ApolloProvider, HttpLink, concat } from "@apollo/client";
 import {onError} from '@apollo/client/link/error';
 import {ResetPassword} from './Components/ResetPassword/ResetPassword';
-import {api_link} from './environment'
+import {api_link, environment} from './environment'
   
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
@@ -73,6 +73,7 @@ function App() {
     setAuthanticated(token.authanticated)
   },[token, authanticated])
   console.log(api_link);
+  console.log(environment);
   return (
     <authContext.Provider value={{authanticated, setAuthanticated}}>
     <ApolloProvider  client={client}>
