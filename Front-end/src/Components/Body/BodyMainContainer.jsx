@@ -58,15 +58,13 @@ const BodyMainContainer = () =>{
     const [properties, setProperties] = useState();
     const {data, error, loading} =  useQuery(GTE_PROPERTIES,{
         variables:{
-            location: ""
+            location: "Conakry"
         }
     });
     
-
     useEffect(()=>{
         if(data){
             setProperties(data.getProperty.properties)
-            console.log(properties?.length);
         }
     })
 
