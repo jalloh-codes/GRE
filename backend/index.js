@@ -20,7 +20,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
   credentials: true,
   origin: function (origin, callback){
-        if(allowedOrigin.indexOf(origin)  > -1){
+        if(!allowedOrigin.includes(origin)){
           let msg = 'The CORS policy for this site does not ' +
                     'allow access from the specified Origin.';
           return callback(new Error(msg), false);
