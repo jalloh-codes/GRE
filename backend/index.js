@@ -15,7 +15,7 @@ const app = express();
 
 const allowedOrigin = ['http://localhost:3000', 'http://10.15.85.21:3000',
 'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com']
-https://kwerde-customer.onrender.com
+
 const corsOptions = {
   optionsSuccessStatus: 200,
   credentials: true,
