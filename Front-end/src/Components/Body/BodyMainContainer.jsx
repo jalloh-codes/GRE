@@ -66,6 +66,7 @@ const BodyMainContainer = () =>{
     useEffect(()=>{
         if(data){
             setProperties(data.getProperty.properties)
+            console.log(properties?.length);
         }
     })
 
