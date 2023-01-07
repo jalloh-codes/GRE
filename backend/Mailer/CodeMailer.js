@@ -31,7 +31,7 @@ export const CodeMailer = async (file, locals) =>{
         auth: {
             user: process.env.EMAIL,
             // 'blessmuss@proton.me',
-            pass: process.env.MAIL_PASS //"bembcqtjglpwwwac"
+            pass: process.env.MAIL_PASS
             //'WeCodeforEver@1'
         },
         // logger: true,
