@@ -58,7 +58,7 @@ const BodyMainContainer = () =>{
     const [properties, setProperties] = useState();
     const {data, error, loading} =  useQuery(GTE_PROPERTIES,{
         variables:{
-            location: "Ratoma"
+            location: ""
         }
     });
     
