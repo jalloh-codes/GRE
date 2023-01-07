@@ -14,13 +14,13 @@ const port = process.env.PORT || 8080;
 const app = express();
 
 const allowedOrigin = ['http://localhost:3000', 'http://10.15.85.21:3000',
-'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com/']
-
+'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com']
+https://kwerde-customer.onrender.com
 const corsOptions = {
   optionsSuccessStatus: 200,
   credentials: true,
   origin: function (origin, callback){
-        if(allowedOrigin.indexOf(origin) === -1){
+        if(allowedOrigin.indexOf(origin)  > -1){
           let msg = 'The CORS policy for this site does not ' +
                     'allow access from the specified Origin.';
           return callback(new Error(msg), false);

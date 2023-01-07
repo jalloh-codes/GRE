@@ -30,20 +30,10 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
-
-// const link = from([
-//   errorLink,
-//    new HttpLink({uri: "http://localhost:8080/gre"}), 
-// ])
-
 const uploadLink = createUploadLink({
   uri: 'https://gre-api-app.onrender.com/gre',
   errorLink
 });
-// const link = createUploadLink([
-//   errorLink,
-//    new HttpLink({uri: "http://localhost:8080/gre"}), 
-// ])
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   // add the authorization to the headers
@@ -65,13 +55,6 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
   return forward(operation);
 })
-
-// const client = new ApolloClient({
-//   link: concat(authMiddleware, link),
-//   cache:new InMemoryCache().restore(window.__APOLLO_STATE__)
-// });
-
-
 
 
 const client = new ApolloClient({
