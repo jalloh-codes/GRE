@@ -12,6 +12,7 @@ import {CodeMailer} from '../Mailer/CodeMailer.js'
 import crypto, { randomBytes } from 'crypto';
 import {propertyImageUpload, getFileReadStrem}  from '../Config/aws.js'
 import { Review } from '../Models/Review.js';
+import { saveMessage, botMessage } from '../controller/messaging.js';
 
 // Validate email & password
 const validateEmail = (email) =>{
@@ -352,7 +353,7 @@ export const resolvers  = {
             properties: properties,
         }
     },
-    
+
     // Create Airbnb Property
     createAirBnb: async (args, req) =>{
         try{
@@ -722,7 +723,9 @@ export const resolvers  = {
                 message: "New Review added"
             }
         } catch (error) {
-            
+            throw Error(error)
         }
-    }
+    },
+    saveMessage,
+    botMessage
 }

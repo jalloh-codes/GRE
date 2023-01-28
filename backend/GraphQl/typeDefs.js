@@ -185,6 +185,22 @@ export const typeDefs = buildSchema(`
         created_at: String!
     }
 
+    input message{
+        from_id: ID!
+        to_id: ID!
+        message: String
+        created_at: String!
+    }
+
+    input bot{
+        firstName: String!
+        lastName: String!
+        email: String
+        phoneNumber: String!
+        message: String!
+        created_at: String!
+    }
+
     type Status{
         status: Boolean
         message: String
@@ -234,6 +250,8 @@ export const typeDefs = buildSchema(`
         VerifyAccount(user: String!, code: String!): VerifyStatus
         UploadImage(file: Upload): Status
         createReview(input: review): Status
+        saveMessage(input: message): Status
+        botMessage(input: bot): Status
     }
 
     schema{

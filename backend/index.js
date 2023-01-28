@@ -21,6 +21,7 @@ const corsOptions = {
   credentials: true,
   origin: function (origin, callback){
         if(!allowedOrigin.includes(origin)){
+          console.log('here', process.env, 'end');
           let msg = 'The CORS policy for this site does not ' +
                     'allow access from the specified Origin.';
           return callback(new Error(msg), false);
@@ -29,7 +30,9 @@ const corsOptions = {
       }
 }
 
-app.use(cors(corsOptions))
+if(process.env.NODE_ENV === 'prod'){
+  app.use(cors(corsOptions))
+}
 const server  = http.createServer(app)
 const db = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.7lv5k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
