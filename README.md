@@ -33,11 +33,14 @@ private project
         - price required
         - descriptions
         - active
+# Message Model (Villa or  room)        
       # Message Model (Villa or  room)
         _ message_to: ID
         - message_from: ID
         - message: String
         - created_at: Date
+# Bot Model (Villa or  room)
+contact us form input
       # Bot Model (Villa or  room)
         _ firstName: String: required
         - lastName: String: required
