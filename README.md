@@ -11,7 +11,7 @@ private project
         - password required
         - UserType 'BuyOrRent' or 'Listing' required
         - phoneNumber required
-   # House Model (Villa or  room)
+   # House Model
         - lister required (NO INPUT NEEDED)
         - region required
         - commune: required
@@ -33,15 +33,12 @@ private project
         - price required
         - descriptions
         - active
-# Message Model (Villa or  room)        
-      # Message Model (Villa or  room)
+# Message Model
         _ message_to: ID
         - message_from: ID
         - message: String
         - created_at: Date
-# Bot Model (Villa or  room)
-contact us form input
-      # Bot Model (Villa or  room)
+# Bot Model (contact us form input)
         _ firstName: String: required
         - lastName: String: required
         - email: String
