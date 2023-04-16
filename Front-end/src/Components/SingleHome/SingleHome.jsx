@@ -7,6 +7,7 @@ import './SingleHome.css';
 import { useState } from "react";
 
 function MyVerticallyCenteredModal(props) {
+
     return (
         <Modal
             {...props}
@@ -20,7 +21,9 @@ function MyVerticallyCenteredModal(props) {
                     {props.value}
                 </Modal.Title>
             </Modal.Header>
-            <div className="picture_for_singleHome_for_the_Modal"><img src={props.images} alt="Logo" /></div>
+            <div className="picture_for_singleHome_for_the_Modal">
+                <img src={props.images} alt="Logo"  loading="lazy"/>
+            </div>
             <div className="container_singleHOme_modal">
                 <p><b>Property Type:</b> {props.roomType}</p>
                 <p><b>Address :</b> {props.address}</p>

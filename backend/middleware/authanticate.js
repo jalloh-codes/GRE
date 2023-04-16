@@ -1,15 +1,12 @@
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) =>{
-    // console.log(req.get('authorization'));
     const authHeader = req.get('authorization');
    
     if(!authHeader){
         req.isAuth =  false;
         return next()
     }
-    let test = authHeader
-
     const bear = authHeader.split(' ')[0]
     const token = authHeader.split(' ')[1];
   

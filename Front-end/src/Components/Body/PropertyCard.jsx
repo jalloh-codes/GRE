@@ -15,7 +15,6 @@ export const PropertyCard = ({propertie}) =>{
             fileKey: profile
         }
     });
-   
     useEffect(()=>{
         if(data){
             
@@ -24,7 +23,6 @@ export const PropertyCard = ({propertie}) =>{
     })
 
     if(loading){
-        console.log(profileImage);
         return(
             <div className="image">
             <SingleHome images={profileImage} 

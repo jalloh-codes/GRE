@@ -2,7 +2,7 @@ import {User} from '../Models/User.js';
 import jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import {Property} from '../Models/Property.js'
-import {AllowRoles} from '../Config/AllowRoles.js'
+import {AllowRoles, getObjectKey} from '../Config/AllowRoles.js'
 import {AirBnB}  from '../Models/AirBnB.js';
 import {Verify} from '../Models/Verify.js'
 import { GraphQLError } from 'graphql';
@@ -12,7 +12,7 @@ import {CodeMailer} from '../Mailer/CodeMailer.js'
 import crypto, { randomBytes } from 'crypto';
 import {propertyImageUpload, getFileReadStrem}  from '../Config/aws.js'
 import { Review } from '../Models/Review.js';
-
+import { AllowPage } from '../middleware/authorize.js';
 // Validate email & password
 const validateEmail = (email) =>{
     const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
@@ -40,7 +40,6 @@ const VerifyAuthorization = async (req) =>{
     const id =  req._id
     const user = await User.findById(id, {verified: 1, role:1});
     const role = AllowRoles[req.authorization]
-    console.log('role', req.authorization);
     if(role !== user.role) throw new GraphQLError("Role not valid")
     return req.authorization
 }
@@ -50,10 +49,19 @@ const user = async (id) =>{
     return user
 }
 
-const AuthPayloadUser = async (email) =>{
+const AuthPayloadUser = async (email, password, api) =>{
     const user = await User.findOne({email: email})
+    const roleType = getObjectKey(user.role);
+    if((roleType === 'Listing' || roleType === 'Admin')  && api === 'CustomerPageInternal'){
+    }else if(roleType === 'BuyOrRent' && api === 'CustomerRental'){
+    } else throw new GraphQLError(JSON.stringify({name:'account', message:'Action not authorized!'}))
+    
     if (!user) throw new GraphQLError(JSON.stringify({name:'account', message:'Account does not exists!'}))
     if(!user.verified) throw new GraphQLError(JSON.stringify({name:'verify', message:'Verify your account!'}))
+    const authanticate = await bcrypt.compareSync(password, user.password)
+    user.password = null
+    if(!authanticate) throw new  GraphQLError(JSON.stringify({name:'authan', message:'Email or Password is inccorect!'}))
+
     return user
 }
 
@@ -137,17 +145,12 @@ export const resolvers  = {
 
     Login: async (args, req) =>{ 
         try{
+        const API_KEY = req.API_KEY.key
         const email = args.email
         const password = args.password
         validateEmail(email)
-        const authuser = await AuthPayloadUser(email)
-        
-       
-        const authanticate = await bcrypt.compareSync(password, authuser.password)
-        authuser.password = null
+        const authuser = await AuthPayloadUser(email, password, API_KEY)
         // Mailer(authuser)
-        if(!authanticate) throw new  GraphQLError(JSON.stringify({name:'authan', message:'Email or Password is inccorect!'}))
-        
 
         const role = getObjKey(AllowRoles, authuser.role)
         const payload = {
