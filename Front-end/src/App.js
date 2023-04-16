@@ -45,12 +45,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         headers: {
           ...headers,
           authorization: token.token,
+          API_KEY: process.env.REACT_APP_API_KEY
         }
       }));
     }else{
       operation.setContext(({ headers = {} }) => ({
         headers: {
-          ...headers
+          ...headers,
+          API_KEY: process.env.REACT_APP_API_KEY
         }
       }));
     }
