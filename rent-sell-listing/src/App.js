@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import './App.css';
 import { LoginComponent } from "./components/LoginComponent/LoginComponent"
 import {  ApolloClient, InMemoryCache, from, ApolloLink,
-    ApolloProvider, HttpLink, concat } from "@apollo/client";
+    ApolloProvider, concat } from "@apollo/client";
 import {
   Routes,
   Route,
@@ -18,7 +18,7 @@ import {Verification} from './components/Verification/Verification'
 import {authContext} from  './Context/authContext';
 import {ResetPassword} from './components/ResetPassword/ResetPassword'
 import { createUploadLink } from 'apollo-upload-client'
-
+import {api_link} from './environment'
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
     graphQLErrors.map(({ message, locations, path }) =>
@@ -31,7 +31,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const uploadLink = createUploadLink({
-  uri: 'https://gre-api-app.onrender.com/gre',
+  uri: api_link,
   errorLink
 });
 
@@ -43,12 +43,14 @@ const authMiddleware = new ApolloLink((operation, forward) => {
       headers: {
         ...headers,
         authorization: token.token,
+        API_KEY: process.env.REACT_APP_API_KEY
       }
     }));
   }else{
     operation.setContext(({ headers = {} }) => ({
       headers: {
-        ...headers
+        ...headers,
+        API_KEY: process.env.REACT_APP_API_KEY
       }
     }));
   }
