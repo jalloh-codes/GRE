@@ -3,8 +3,9 @@ import {User} from '../Models/User.js';
 import fs from 'fs'
 import path from 'path'
 import hbs from 'handlebars'
-import { GraphQLError } from 'graphql'
 import smtpTransport from 'nodemailer-smtp-transport';
+import { default as dotenv } from 'dotenv';
+dotenv.config();
 const __dirname = path.resolve();
 
 export const CodeMailer = async (file, locals) =>{
@@ -28,9 +29,9 @@ export const CodeMailer = async (file, locals) =>{
         port: 465,
         secure: true,
         auth: {
-            user: "saylujalloh@gmail.com",
+            user: process.env.EMAIL,
             // 'blessmuss@proton.me',
-            pass:  "bembcqtjglpwwwac"
+            pass: process.env.MAIL_PASS
             //'WeCodeforEver@1'
         },
         // logger: true,
