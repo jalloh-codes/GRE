@@ -7,9 +7,9 @@ const getEnviroment = (env) => {
         case 'development':
             return ['https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com']
         case 'uat':
-            return ['https://kwerde-internal-uat.onrender.com/', 'https://kwerde-public-uat.onrender.com/']
+            return ['https://kwerde-internal-uat.onrender.com', 'https://kwerde-public-uat.onrender.com']
         case 'release':
-            return ['https://kwerde-internal-uat.onrender.com/', 'https://kwerde-public-uat.onrender.com/']
+            return ['https://kwerde-internal-uat.onrender.com', 'https://kwerde-public-uat.onrender.com']
         default:
             return ['http://localhost:3000']
     }
