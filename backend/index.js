@@ -10,12 +10,12 @@ import {authorize} from './middleware/authorize.js'
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
 import { GraphQLError } from 'graphql';
 import * as dotenv from 'dotenv'
+import {environment} from './enviroment.js'
 dotenv.config()
 const port = process.env.PORT || 8080;
 const app = express();
 
-const allowedOrigin = ['http://localhost:3000', 'http://10.15.85.21:3000',
-'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com']
+const allowedOrigin = environment
 
 const corsOptions = {
   optionsSuccessStatus: 200,
