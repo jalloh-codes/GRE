@@ -7,7 +7,7 @@ const api = (env) =>{
         case 'development':
             return 'https://gre-api-app.onrender.com/gre'
         case 'uat': 
-            return 'https://gre-api-uat.onrender.com'
+            return 'https://gre-api-uat.onrender.com/gre'
         default:
             return 'http://localhost:8080/gre'
     }
