@@ -1,7 +1,7 @@
 const allowedOrigin = ['http://localhost:3000', 'http://10.15.85.21:3000',
 'https://kwerde.onrender.com', 'https://kwerde-customer.onrender.com']
 
-const envId =  process.env.NODE_ENV
+const envId =  process.env.APP_ENV
 const getEnviroment = (env) => {
     switch (env) {
         case 'development':

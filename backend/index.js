@@ -59,5 +59,5 @@ mongoose.connect(db, {useUnifiedTopology: true, useNewUrlParser: true})
 
 
 server.listen(port, () => {
-    console.log(`Server is running on port ${port}.`);
+    console.log(`Server is running on port ${port}.`, process.env.APP_ENV);
 });
